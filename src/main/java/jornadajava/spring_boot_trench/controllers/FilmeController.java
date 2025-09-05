@@ -52,14 +52,19 @@ public class FilmeController {
     @GetMapping("/{id}")
     public ResponseEntity<FilmeGetResponse> FindById(@PathVariable Long id){
         log.debug("requisição para identificar um id na lista {}", id);
+
         //primeiro: adicionar a fonte de dafos no metodo
         var listDomain = Filme.getFilmes();
+
         //segundo: verificando cada objeto da lista
         for (Filme filme : listDomain){
+
             //terceiro: identificando o id requisitado
             if (filme.getId().equals(id)){
+
                 //quarto: copiando o objeto ligado ao id para o dto
                 var dto = FilmeMapper.FILME_MAPPER.toFilmeGetResponse(filme);
+
                 //quinto: retorna a lista desacoplada
                 return ResponseEntity.ok(dto);
             }
@@ -144,6 +149,15 @@ public class FilmeController {
         log.info("filme atualizado: {}", filmeToUpdate);
 
         return ResponseEntity.noContent().build();
+
+        // DELETE e PUT Mapping se comportam de maneiras diferentes,
+        // em ambos o metodos é necessario criar uma variavel para guardar o parametro passado pelo cliente
+        //assim é precico iniciar um loop para percorrer a lista
+        //parar o loop quando o parametro desejado é encontrado
+        //e entao atribuir o parametro na variavel para guardar e modificar ela de acordo com o metodo
+
+        //GET e POST Mapping não precisam disso pois estamos mexendo na lista como um todo
+        //entao é só necessario ler a lista e aplicar a regra de negocio desejada
     }
 }
   

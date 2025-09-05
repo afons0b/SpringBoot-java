@@ -77,8 +77,14 @@ public class ProducerController {
         log.debug("Request receive to all list all produces, param name {}", name);
 
         var producers = Producer.getProducer();
-        var produceGetResonse = MAPPER.toProduceGetResponseLIST(producers);
+        var producerGetResponseList = MAPPER.toProduceGetResponseLIST(producers);
+        if (name == null) return ResponseEntity.ok(producerGetResponseList);
 
-        var response =
+        var response = producerGetResponseList
+                .stream()
+                .filter(producerGetResponse -> producerGetResponse.getNome().equalsIgnoreCase(name))
+                .toList();
+
+        return ResponseEntity.ok(response);
     }
 }

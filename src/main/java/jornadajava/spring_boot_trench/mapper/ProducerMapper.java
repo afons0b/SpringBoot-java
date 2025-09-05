@@ -1,6 +1,8 @@
 package jornadajava.spring_boot_trench.mapper;
 
+import jornadajava.spring_boot_trench.domain.Filme;
 import jornadajava.spring_boot_trench.domain.Producer;
+import jornadajava.spring_boot_trench.request.FilmePutRequest;
 import jornadajava.spring_boot_trench.request.ProducerPostRequest;
 import jornadajava.spring_boot_trench.response.ProducerGetResponse;
 import org.mapstruct.Mapper;
@@ -21,4 +23,5 @@ public interface ProducerMapper {
     ProducerGetResponse toProducerGetResponse (Producer producer);
 
     List<ProducerGetResponse> toProduceGetResponseLIST(List<Producer> producers);
+
 }

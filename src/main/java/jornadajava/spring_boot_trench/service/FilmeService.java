@@ -14,6 +14,12 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.ArrayList;
 import java.util.List;
 
+//a organização do codigo mudou para o padrao MVC,
+// onde cada função é separada,
+// em service(o cerebro da API), 
+// repository(onde fica armazenado os dados e os metodos para acessalos)
+// e controller(que expoem essa API para a web)
+
 @Slf4j
 @Service
 public class FilmeService {

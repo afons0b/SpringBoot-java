@@ -3,6 +3,7 @@ package jornadajava.spring_boot_trench.mapper;
 import jornadajava.spring_boot_trench.domain.Serie;
 import jornadajava.spring_boot_trench.request.SeriePostRequest;
 import jornadajava.spring_boot_trench.request.SeriePutRequest;
+import jornadajava.spring_boot_trench.response.SerieGetResponse;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
@@ -15,7 +16,7 @@ public interface SerieMapper {
 
     Serie toSerie (SeriePostRequest postRequest);
 
-    Serie toSerieGetResponse (Serie serie);
+    SerieGetResponse toSerieGetResponse (Serie serie);
 
     @Mapping(target = "id", ignore = true)
     void SerieToUpdate (SeriePutRequest dto, @MappingTarget Serie serie);

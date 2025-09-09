@@ -28,6 +28,7 @@ public class SerieRepository {
     }
 
     public Optional<Serie> findById(Long id){
+
         for (Serie serie : findAll()){
             if (serie.getId().equals(id)){
                 return Optional.of(serie);
@@ -36,21 +37,25 @@ public class SerieRepository {
         return Optional.empty();
     }
 
-    public Optional<Serie> findByName(String name){
-        for (Serie serie : findAll()){
+    public List<Serie> findByName(String name){
+        List<Serie> filterList = new ArrayList<>();
+        for (Serie serie : SERIES){
             if (serie.getNome().equalsIgnoreCase(name)){
-                return Optional.of(serie);
+                filterList.add(serie);
             }
         }
-        return Optional.empty();
+        return filterList;
     }
 
     public void delete(Serie serie){
         SERIES.remove(serie);
     }
 
-    public void save(Serie serie){
+
+    public Serie save(Serie serie){
         serie.setId(proximoID++);
         SERIES.add(serie);
+        return serie;
     }
+
 }

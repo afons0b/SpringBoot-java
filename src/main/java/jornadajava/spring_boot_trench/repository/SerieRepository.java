@@ -48,14 +48,26 @@ public class SerieRepository {
     }
 
     public void delete(Serie serie){
-        SERIES.remove(serie);
+        for ( int i = 0; i < SERIES.size(); i++ ){
+            if (SERIES.get(i).getId().equals(serie.getId())){
+                SERIES.remove(i);
+                return;
+            }
+        }
     }
 
 
     public Serie save(Serie serie){
-        serie.setId(proximoID++);
-        SERIES.add(serie);
+        if (serie.getId()==null){
+            serie.setCreatedAt(LocalDateTime.now());
+            serie.setId(proximoID++);
+            SERIES.add(serie);
+        }else {
+            SERIES.removeIf(serieExistente -> serieExistente.getId().equals(serie.getId()));
+            SERIES.add(serie);
+        }
         return serie;
     }
+
 
 }

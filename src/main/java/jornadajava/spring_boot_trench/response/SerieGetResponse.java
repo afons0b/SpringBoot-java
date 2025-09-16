@@ -13,5 +13,5 @@ public class SerieGetResponse {
     private Long id;
     private String nome;
     private int temporada;
-    private LocalDateTime createdat;
+    private LocalDateTime createdAt;
 }

@@ -14,8 +14,11 @@ public interface SerieMapper {
 
     SerieMapper MAPPER = Mappers.getMapper(SerieMapper.class);
 
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", ignore = true)
     Serie toSerie (SeriePostRequest postRequest);
 
+    @Mapping(source = "createdAt", target = "createdAt")
     SerieGetResponse toSerieGetResponse (Serie serie);
 
     @Mapping(target = "id", ignore = true)

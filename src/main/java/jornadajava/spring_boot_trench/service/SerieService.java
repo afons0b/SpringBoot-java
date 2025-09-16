@@ -21,8 +21,8 @@ public class SerieService {
     private static final SerieMapper mapper = SerieMapper.MAPPER;
     private final SerieRepository repository;
 
-    public SerieService(){
-        this.repository = new SerieRepository();
+    public SerieService(SerieRepository repository){
+        this.repository = repository;
     }
 
     public List<SerieGetResponse> findByName(String name){
@@ -43,9 +43,16 @@ public class SerieService {
     public List<SerieGetResponse> getAll(){
         List<Serie> allList = repository.findAll();
 
+        if (!allList.isEmpty()){
+            System.out.println("DEBUG - createdAt: " + allList.get(0).getCreatedAt());
+        }
+
         List<SerieGetResponse> responseList = new ArrayList<>();
         for (Serie serie : allList){
             var dto = mapper.toSerieGetResponse(serie);
+
+            System.out.println("DEBUG DTO - createdAt: " + dto.getCreatedAt());
+
             responseList.add(dto);
         }
         return responseList;
@@ -110,7 +117,8 @@ public class SerieService {
         //o mapper faz o trabalho mano de atualizar cada atributo post request em dominio
         Serie serie = mapper.toSerie(postRequest);
 
-        //no repository.save contem a logica de remover um livro antigo de mesmo id pelo novo de mesmo id
+        serie.setId(null);
+
         Serie savedSERIE = repository.save(serie);
 
         //trazendo um ""

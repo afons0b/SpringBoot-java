@@ -87,7 +87,7 @@ public class SerieService {
 
         //aqui é feita uma validação onde o id não pode ser nulo
         if (id == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id nao pode ser nulo");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id nao pode ser nulo ou inexistente");
         }
 
         //serieOptional recebe o objeto do id requisitado pelo cliente
@@ -124,4 +124,23 @@ public class SerieService {
         //trazendo um ""
         return mapper.toSerieGetResponse(savedSERIE);
     }
+
+    public SerieGetResponse findLongestTVSerie(){
+        var series = repository.findAll();
+        //criar variavel para a serie com mais temporadas
+        var longestSerie = series.get(0);
+
+        for (int i = 1; i < series.size(); i++){
+
+            //criar variavel para a serie atual
+            var serieAtual = series.get(i);
+
+            if (serieAtual.getTemporada() > longestSerie.getTemporada()){
+
+                longestSerie = serieAtual;
+            }
+        }
+        return mapper.toSerieGetResponse(longestSerie);
+    }
+
 }

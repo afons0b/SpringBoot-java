@@ -18,11 +18,12 @@ import java.util.Optional;
 @Service
 public class SerieService {
 
-    private static final SerieMapper mapper = SerieMapper.MAPPER;
+    private final SerieMapper mapper;
     private final SerieRepository repository;
 
-    public SerieService(SerieRepository repository){
+    public SerieService(SerieRepository repository, SerieMapper mapper){
         this.repository = repository;
+        this.mapper = mapper;
     }
 
     public List<SerieGetResponse> findByName(String name){

@@ -44,7 +44,7 @@ class SerieRepositoryTest {
         BDDMockito.when(serieData.getSeries()).thenReturn(serieList);
 
         var series = repository.findAll();
-        Assertions.assertThat(series).isNotNull().hasSize(series.size());
+        Assertions.assertThat(series).isNotNull().hasSize(3);
     }
 
     @Test
@@ -88,8 +88,6 @@ class SerieRepositoryTest {
         BDDMockito.when(serieData.getSeries()).thenReturn(serieList);
         BDDMockito.when(serieData.gerarId()).thenReturn(4L);
 
-        System.out.println("Tamanho da lista: " + serieList.size());
-
         var novaSerie = Serie.builder()
                 .id(null)
                 .nome("Smiling Friends")
@@ -98,6 +96,8 @@ class SerieRepositoryTest {
                 .build();
 
         var serieSalva = repository.save(novaSerie);
+
+        System.out.println("Tamanho da lista: " + serieList.size());
 
         System.out.println("ID gerado: " + serieSalva.getId());
 

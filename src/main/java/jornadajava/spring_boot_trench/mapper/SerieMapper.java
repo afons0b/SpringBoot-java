@@ -9,6 +9,8 @@ import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 import org.mapstruct.factory.Mappers;
 
+import java.util.List;
+
 @Mapper
 public interface SerieMapper {
 
@@ -24,6 +26,8 @@ public interface SerieMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
     void SerieToUpdate (SeriePutRequest dto, @MappingTarget Serie serie);
+
+    List<SerieGetResponse> toSerieGetResponseList(List<Serie> series);
 
 
 }

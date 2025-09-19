@@ -115,9 +115,36 @@ class SerieRepositoryTest {
         BDDMockito.when(serieData.getSeries()).thenReturn(serieList);
 
         var serieRemovida = serieList.getFirst();
+
+        Assertions.assertThat(serieList).hasSize(3);
+
         repository.delete(serieRemovida);
 
+        Assertions.assertThat(serieList).hasSize(2);
+
         Assertions.assertThat(serieList).isNotEmpty().doesNotContain(serieRemovida);
+
+    }
+
+    @Test
+    @DisplayName("metodo update deve atualizar uma serie e confirmar que foi atualizado")
+    @Order(6)
+    void methodUpdate_to_update_a_TVSerie(){
+        BDDMockito.when(serieData.getSeries()).thenReturn(serieList);
+
+        var serieParaAtualizar = serieList.getFirst();
+
+        serieParaAtualizar.setId(1L);
+        serieParaAtualizar.setNome("Fate");
+        serieParaAtualizar.setTemporada(3);
+
+        repository.save(serieParaAtualizar);
+
+        System.out.println("Nome gerado: " + serieParaAtualizar.getNome());
+        System.out.println("ID gerado: " + serieParaAtualizar.getId());
+
+        Assertions.assertThat(serieParaAtualizar.getId()).isEqualTo(1L);
+        Assertions.assertThat(serieParaAtualizar.getNome()).isEqualTo("Fate");
 
     }
 }

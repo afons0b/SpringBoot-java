@@ -3,10 +3,12 @@ package jornadajava.spring_boot_trench.service;
 import jornadajava.spring_boot_trench.domain.Serie;
 import jornadajava.spring_boot_trench.mapper.SerieMapper;
 import jornadajava.spring_boot_trench.repository.SerieRepository;
+import jornadajava.spring_boot_trench.request.SeriePostRequest;
 import jornadajava.spring_boot_trench.response.SerieGetResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.BDDMockito;
@@ -17,6 +19,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 @ExtendWith(MockitoExtension.class)
@@ -51,6 +54,7 @@ class SerieServiceTest {
 
     @Test
     @DisplayName("teste para receber a serie com mais temporadas")
+    @Order(1)
     void find_returnTVserie_withMore_season(){
         BDDMockito.when(repository.findAll()).thenReturn(serieListDomain);
 
@@ -65,13 +69,120 @@ class SerieServiceTest {
     }
 
     @Test
-    @DisplayName("teste para retornar todos os objetos")
-    void findAll_method() {
-        BDDMockito.when(mapper.toSerieGetResponseList(serieListDomain)).thenReturn(serieListResponse);
+    @DisplayName("getAll (com for-loop no service) deve retornar lista de DTOs")
+    @Order(2)
+    void getAll_comForLoop_retornaListaDeDtos() {
 
-        List<SerieGetResponse> responses = service.getAll();
+        BDDMockito.when(repository.findAll()).thenReturn(serieListDomain);
 
-        Assertions.assertThat(responses).usingRecursiveComparison().ignoringFields("createdAt").isEqualTo(serieListResponse);
+        for (int i = 0; i < serieListDomain.size(); i++) {
+            Serie serieDomain = serieListDomain.get(i);
+            SerieGetResponse serieGetResponse = serieListResponse.get(i);
+
+            BDDMockito.when(mapper.toSerieGetResponse(serieDomain)).thenReturn(serieGetResponse);
+        }
+
+        List<SerieGetResponse> resultado = service.getAll();
+
+        Assertions.assertThat(resultado).isNotNull().isEqualTo(serieListResponse);
+
+        Assertions.assertThat(serieListResponse).hasSize(3);
     }
 
+    @Test
+    @DisplayName("metodo findByName deve retornar uma lista de nomes usando como referencia o parametro passado")
+    @Order(3)
+    void findByName_deveRetornar_umaLista(){
+
+        List<Serie> dunaSerie = List.of(serieListDomain.get(1), serieListDomain.get(1));
+        List<SerieGetResponse> dunaResponse = List.of(serieListResponse.get(1), serieListResponse.get(1));
+
+        BDDMockito.when(repository.findByName("Duna")).thenReturn(dunaSerie);
+
+        for (int i = 0; i < dunaSerie.size(); i++){
+            BDDMockito.when(mapper.toSerieGetResponse(dunaSerie.get(i)))
+                    .thenReturn(dunaResponse.get(i));
+        }
+
+        List<SerieGetResponse> responses = service.findByName("Duna");
+
+        Assertions.assertThat(responses).hasSize(2);
+
+        Assertions.assertThat(responses).isEqualTo(dunaResponse);
+
+        System.out.println("Nome gerado: " + responses);
+
+    }
+
+    @Test
+    @DisplayName("metodo para buscar um objeto pelo id")
+    @Order(4)
+    void findById_deveRetornar_umObjeto_peloId(){
+
+        Serie serie = serieListDomain.getFirst();
+        SerieGetResponse serieResponse = serieListResponse.getFirst();
+
+        BDDMockito.when(repository.findById(serie.getId())).thenReturn(Optional.of(serie));
+        BDDMockito.when(mapper.toSerieGetResponse(serie)).thenReturn(serieResponse);
+
+        SerieGetResponse response = service.findById(serie.getId());
+
+        Assertions.assertThat(response).isEqualTo(serieResponse);
+    }
+
+    @Test
+    @DisplayName("metodo para deletar um objeto pelo id")
+    @Order(5)
+    void deleteById_testMethod(){
+        Serie serieToDelete = serieListDomain.getFirst();
+
+        Assertions.assertThat(serieListDomain).hasSize(3);
+
+        BDDMockito.when(repository.findById(serieToDelete.getId()))
+                .thenReturn(Optional.of(serieToDelete));
+
+        service.delete(serieToDelete.getId());
+
+        BDDMockito.verify(repository, BDDMockito.times(1)).delete(serieToDelete);
+    }
+
+    @Test
+    @DisplayName("metodo para salvar um objeto na lista")
+    void save_method_test(){
+
+        SeriePostRequest postRequest = SeriePostRequest.builder()
+                .nome("Breaking Bad").temporada(5)
+                .build();
+
+        Serie serieDomain = Serie.builder()
+                .id(null).nome("Breaking Bad").temporada(5)
+                .build();
+
+        Serie serieSalva = Serie.builder()
+                .id(4L).nome("Breaking Bad").temporada(5).createdAt(LocalDateTime.now())
+                .build();
+
+        SerieGetResponse expectedResponse = SerieGetResponse.builder()
+                .id(4L).nome("Breaking Bad").temporada(5).createdAt(LocalDateTime.now())
+                .build();
+
+        //cliente envia o objeto como dto postRequest
+        BDDMockito.when(mapper.toSerie(postRequest)).thenReturn(serieDomain);
+        //repositorio salva no banco como dominio
+        BDDMockito.when(repository.save(serieDomain)).thenReturn(serieSalva);
+        //e o mapper retorna o objeto salvo como dto para o cliente
+        BDDMockito.when(mapper.toSerieGetResponse(serieSalva)).thenReturn(expectedResponse);
+
+        SerieGetResponse response = service.save(postRequest);
+
+        Assertions.assertThat(response).isEqualTo(expectedResponse);
+        Assertions.assertThat(response.getId()).isNotNull();
+
+        BDDMockito.verify(repository, BDDMockito
+                .times(1)).save(serieDomain);
+
+        List<Serie> listaatualizada = repository.findAll();
+        Assertions.assertThat(listaatualizada).hasSize(4);
+        Assertions.assertThat(listaatualizada).contains(serieSalva);
+    }
 }

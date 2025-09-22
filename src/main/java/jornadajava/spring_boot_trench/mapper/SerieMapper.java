@@ -27,7 +27,4 @@ public interface SerieMapper {
     @Mapping(target = "createdAt", ignore = true)
     void SerieToUpdate (SeriePutRequest dto, @MappingTarget Serie serie);
 
-    List<SerieGetResponse> toSerieGetResponseList(List<Serie> series);
-
-
 }

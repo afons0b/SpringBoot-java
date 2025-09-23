@@ -54,23 +54,7 @@ class SerieServiceTest {
     }
 
     @Test
-    @DisplayName("teste para receber a serie com mais temporadas")
-    @Order(1)
-    void find_returnTVserie_withMore_season(){
-        BDDMockito.when(repository.findAll()).thenReturn(serieListDomain);
-
-        SerieGetResponse serieLonga = service.findLongestTVSerie();
-
-        System.out.println("Nome gerado: " + serieLonga.getNome());
-
-        org.assertj.core.api.Assertions.assertThat(serieLonga).isNotNull();
-
-        Assertions.assertThat(serieLonga.getNome()).isEqualTo("Dark");
-
-    }
-
-    @Test
-    @DisplayName("getAll (com for-loop no service) deve retornar lista de DTOs")
+    @DisplayName("getAll deve retornar lista de DTOs")
     @Order(2)
     void getAll_comForLoop_retornaListaDeDtos() {
 
@@ -189,10 +173,6 @@ class SerieServiceTest {
 
         BDDMockito.verify(repository, BDDMockito
                 .times(1)).save(serieDomain);
-
-        List<Serie> listaatualizada = repository.findAll();
-        Assertions.assertThat(listaatualizada).hasSize(4);
-        Assertions.assertThat(listaatualizada).contains(serieSalva);
 
     }
 

@@ -106,6 +106,14 @@ public class SerieService {
 
         //e retornamos um "recibo" dto do updatedSerie
         return mapper.toSerieGetResponse(updatedSerie);
+
+        //em passos, fica: chegada do dto put request(esse dto diz o que vai ser modificado no objeto)
+        //pegamos o objeto buscado pelo id no repositorio(um objeto Optional)
+        //extraimos esse optional para a variavel que vamos fazer o update
+        //mapper.SerieToUpdate(putRequest, serieToUpdate); <- nesta linha diz que: serieToUpdate
+        // é o que vamos modificar e putRequest é o que vamos "usar" para modificar
+        //salvamos o objeto atualizado no banco
+        //e retornamos um dto do mesmo para o cliente mostrando o que foi atualizado
     }
 
     //transformar um dto postRequest para dominio

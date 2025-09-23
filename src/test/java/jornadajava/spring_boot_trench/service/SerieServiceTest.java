@@ -4,6 +4,7 @@ import jornadajava.spring_boot_trench.domain.Serie;
 import jornadajava.spring_boot_trench.mapper.SerieMapper;
 import jornadajava.spring_boot_trench.repository.SerieRepository;
 import jornadajava.spring_boot_trench.request.SeriePostRequest;
+import jornadajava.spring_boot_trench.request.SeriePutRequest;
 import jornadajava.spring_boot_trench.response.SerieGetResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -134,10 +135,13 @@ class SerieServiceTest {
     @DisplayName("metodo para deletar um objeto pelo id")
     @Order(5)
     void deleteById_testMethod(){
+        //pegando o primeiro objeo da lista
         Serie serieToDelete = serieListDomain.getFirst();
 
+        //afirmamos que a lista possui 3 objetos
         Assertions.assertThat(serieListDomain).hasSize(3);
 
+        //ensinando que: quando chamamos o findById do repositorio, retornamos um Optional da variavel serieToDelete
         BDDMockito.when(repository.findById(serieToDelete.getId()))
                 .thenReturn(Optional.of(serieToDelete));
 
@@ -148,20 +152,25 @@ class SerieServiceTest {
 
     @Test
     @DisplayName("metodo para salvar um objeto na lista")
+    @Order(6)
     void save_method_test(){
 
+        //chegada do dto postRequest
         SeriePostRequest postRequest = SeriePostRequest.builder()
                 .nome("Breaking Bad").temporada(5)
                 .build();
 
+        //aqui simula a logica do repositorio
         Serie serieDomain = Serie.builder()
                 .id(null).nome("Breaking Bad").temporada(5)
                 .build();
 
+        //serie salva no banco
         Serie serieSalva = Serie.builder()
                 .id(4L).nome("Breaking Bad").temporada(5).createdAt(LocalDateTime.now())
                 .build();
 
+        //retorno da serie como dto SerieGetResponse
         SerieGetResponse expectedResponse = SerieGetResponse.builder()
                 .id(4L).nome("Breaking Bad").temporada(5).createdAt(LocalDateTime.now())
                 .build();
@@ -184,5 +193,40 @@ class SerieServiceTest {
         List<Serie> listaatualizada = repository.findAll();
         Assertions.assertThat(listaatualizada).hasSize(4);
         Assertions.assertThat(listaatualizada).contains(serieSalva);
+
+    }
+
+    @Test
+    @DisplayName("metodo para atualizar um objeto usando DTO")
+    @Order(7)
+    void update_method(){
+        //chegada do putRequest
+        SeriePutRequest putRequest = SeriePutRequest.builder()
+                .id(1L)
+                .nome("Kaijuno8")
+                .temporada(3)
+                .build();
+
+        Serie serieToUpdate = serieListDomain.getFirst();
+
+        SerieGetResponse response = SerieGetResponse.builder()
+                .id(serieToUpdate.getId())
+                .nome(putRequest.getNome())
+                .temporada(putRequest.getTemporada())
+                .build();
+
+        BDDMockito.when(repository.findById(serieToUpdate.getId()))
+                .thenReturn(Optional.of(serieToUpdate));
+
+        BDDMockito.doNothing().when(mapper).SerieToUpdate(putRequest, serieToUpdate);
+
+        BDDMockito.when(repository.save(serieToUpdate)).thenReturn(serieToUpdate);
+
+        BDDMockito.when(mapper.toSerieGetResponse(serieToUpdate)).thenReturn(response);
+
+        SerieGetResponse updateResponse = service.update(serieToUpdate.getId(), putRequest);
+
+        Assertions.assertThat(updateResponse).isEqualTo(response);
+
     }
 }

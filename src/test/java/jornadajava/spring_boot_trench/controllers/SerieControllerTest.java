@@ -12,6 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.http.MediaType;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -108,4 +109,54 @@ class SerieControllerTest {
                 .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
+    @Test
+    @DisplayName("GET v1/serie/1 retorna uma serie com id passado")
+    @Order(4)
+    void save_method() throws Exception {
+        BDDMockito.when(serieData.gerarId()).thenReturn(4L);
+
+        var request = readResourceLoader("serie/save-request-serie.201.json");
+
+        mockMvc.perform(MockMvcRequestBuilders.post("/v1/serie")
+                        .content(request)
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(4L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value("Kaijuno8"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt").exists());
+
+    }
+
+    @Test
+    @DisplayName("metodo para testar atualizar um objeto usando DTO")
+    @Order(7)
+    void update_method() throws Exception {
+        BDDMockito.when(serieData.getSeries()).thenReturn(serieList);
+        var request = readResourceLoader("serie/put-request-serie-201.json");
+        var id = 1L;
+
+        mockMvc.perform(MockMvcRequestBuilders.put("/v1/serie/{id}", id)
+                .content(request)
+                .contentType(MediaType.APPLICATION_JSON)).andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isOk())
+
+                .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value("Kaijuno"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt").exists());
+
+    }
+
+    @Test
+    @DisplayName("metodo para deletar um objeto pelo id")
+    @Order(5)
+    void deleteById_testMethod() throws Exception {
+        BDDMockito.when(serieData.getSeries()).thenReturn(serieList);
+
+        var id = serieList.getFirst().getId();
+
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/serie/{id}", id))
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
 }

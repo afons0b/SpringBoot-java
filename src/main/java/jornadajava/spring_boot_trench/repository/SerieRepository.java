@@ -50,13 +50,11 @@ public class SerieRepository {
 
 
     public Serie save(Serie serie){
-        System.out.println("DEBUG REPOSITORY - Criando nova série, setando createdAt");
         if (serie.getId()==null){
             serie.setCreatedAt(LocalDateTime.now());
             serie.setId(serieData.gerarId());
             serieData.getSeries().add(serie);
         }else {
-            System.out.println("DEBUG REPOSITORY - Atualizando nova série, setando createdAt");
             serieData.getSeries().removeIf(serieExistente -> serieExistente.getId().equals(serie.getId()));
             serieData.getSeries().add(serie);
         }

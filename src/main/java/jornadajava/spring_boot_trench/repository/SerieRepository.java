@@ -1,7 +1,9 @@
 package jornadajava.spring_boot_trench.repository;
 
+import external.dependency.Connection;
 import jornadajava.spring_boot_trench.domain.Serie;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDateTime;
@@ -11,8 +13,9 @@ import java.util.Optional;
 
 @Repository
 @RequiredArgsConstructor
+@Log4j2
 public class SerieRepository {
-
+    private final Connection connection;
     private final SerieData serieData;
 
     public List<Serie> findAll(){

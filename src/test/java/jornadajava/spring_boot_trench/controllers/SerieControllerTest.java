@@ -142,7 +142,7 @@ class SerieControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isOk())
 
                 .andExpect(MockMvcResultMatchers.jsonPath("$.id").value(1L))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value("Kaijuno"))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.nome").value("Kaijuno8"))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.createdAt").exists());
 
     }

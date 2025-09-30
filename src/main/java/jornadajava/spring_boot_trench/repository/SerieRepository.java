@@ -19,6 +19,7 @@ public class SerieRepository {
     private final SerieData serieData;
 
     public List<Serie> findAll(){
+        log.info("connection {}", connection);
         return serieData.getSeries();
     }
 

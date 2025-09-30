@@ -7,9 +7,3 @@ spring:
   threads:
     virtual:
       enabled: true
-
-database:
-  mysql:
-    url: localhost:3306
-    username: afonsob
-    password: neekisz1

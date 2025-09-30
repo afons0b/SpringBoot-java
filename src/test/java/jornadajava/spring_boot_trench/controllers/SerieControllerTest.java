@@ -10,9 +10,11 @@ import org.junit.jupiter.api.*;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.http.MediaType;
+import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
@@ -27,6 +29,8 @@ import java.util.List;
 
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @WebMvcTest(controllers = SerieController.class)
+@ComponentScan(basePackages = {"jornadajava.spring_boot_trench", "external.dependency"})
+@ActiveProfiles("test")
 @Import({SerieMapperImpl.class, SerieService.class, SerieRepository.class, SerieData.class})
 class SerieControllerTest {
     @Autowired
@@ -110,7 +114,7 @@ class SerieControllerTest {
     }
 
     @Test
-    @DisplayName("GET v1/serie/1 retorna uma serie com id passado")
+    @DisplayName("POST v1/serie/ salva uma nova serie no banco")
     @Order(4)
     void save_method() throws Exception {
         BDDMockito.when(serieData.gerarId()).thenReturn(4L);

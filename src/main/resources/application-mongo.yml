@@ -1,0 +1,4 @@
+database:
+  url: localhost:3306
+  username: mongo123
+  password: mongokey

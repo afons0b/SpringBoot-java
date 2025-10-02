@@ -2,7 +2,6 @@ package jornadajava.spring_boot_trench.repository;
 
 import jornadajava.spring_boot_trench.domain.User;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -11,7 +10,6 @@ import java.util.Optional;
 
 @RequiredArgsConstructor
 @Repository
-@Log4j2
 public class UserRepository {
     //meu reposiorio precisa do UserData entao faremos uma injeção de dependencia
     private final UserData userData;

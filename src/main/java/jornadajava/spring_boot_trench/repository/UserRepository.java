@@ -38,6 +38,9 @@ public class UserRepository {
         return filteredNameList;
     }
 
+    //o metodo promete retornar um Optional, basicamente ele ja trata de dar uma resposta caso o id nao exista
+    //o optional se aplica somente se for somente um objeto
+    //eu poderia usar no findByName mas
     public Optional<User> findById(Long id){
         for (int i = 0; i < userData.getUsers().size(); i++){
             User user = userData.getUsers().get(i);
@@ -53,7 +56,7 @@ public class UserRepository {
         for (int i =0; i < userData.getUsers().size(); i++){
             User user = userData.getUsers().get(i);
 
-            if (userData.getUsers().get(i).getId().equals(user.getId())){
+            if (user.getId().equals(id)){
                 userData.getUsers().remove(i);
                 return;
             }
@@ -66,5 +69,10 @@ public class UserRepository {
             userData.getUsers().add(user);
         }
         return user;
+    }
+
+    public void update(User user){
+        deleteById(user.getId());
+        userData.getUsers().add(user);
     }
 }

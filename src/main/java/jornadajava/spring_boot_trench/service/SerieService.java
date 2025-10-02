@@ -44,15 +44,9 @@ public class SerieService {
     public List<SerieGetResponse> getAll(){
         List<Serie> allList = repository.findAll();
 
-        if (!allList.isEmpty()){
-            System.out.println("DEBUG - createdAt: " + allList.get(0).getCreatedAt());
-        }
-
         List<SerieGetResponse> responseList = new ArrayList<>();
         for (Serie serie : allList){
             var dto = mapper.toSerieGetResponse(serie);
-
-            System.out.println("DEBUG DTO - createdAt: " + dto.getCreatedAt());
 
             responseList.add(dto);
         }

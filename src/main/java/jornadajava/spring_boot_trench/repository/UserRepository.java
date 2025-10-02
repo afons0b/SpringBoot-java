@@ -69,8 +69,9 @@ public class UserRepository {
         return user;
     }
 
-    public void update(User user){
+    public User update(User user){
         deleteById(user.getId());
         userData.getUsers().add(user);
+        return user;
     }
 }

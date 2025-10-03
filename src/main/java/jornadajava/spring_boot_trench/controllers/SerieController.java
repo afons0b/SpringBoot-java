@@ -4,6 +4,7 @@ import jornadajava.spring_boot_trench.request.SeriePostRequest;
 import jornadajava.spring_boot_trench.request.SeriePutRequest;
 import jornadajava.spring_boot_trench.response.SerieGetResponse;
 import jornadajava.spring_boot_trench.service.SerieService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,15 +13,12 @@ import java.util.List;
 
 @RestController
 @RequestMapping("v1/serie")
+@RequiredArgsConstructor
 public class SerieController {
     private final SerieService service;
 
-    public SerieController(SerieService service){
-        this.service = service;
-    }
-
     @GetMapping
-    public ResponseEntity<List<SerieGetResponse>> findall(){
+    public ResponseEntity<List<SerieGetResponse>> findAll(){
         List<SerieGetResponse> getSerie = service.getAll();
         return ResponseEntity.ok(getSerie);
     }

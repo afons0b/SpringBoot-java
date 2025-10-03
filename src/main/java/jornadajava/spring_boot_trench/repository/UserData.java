@@ -12,7 +12,7 @@ import java.util.List;
 public class UserData {
     //criação da lista da classe User
     private final List<User> users = new ArrayList<>();
-    private Long newId = 4L;
+    private Long newId = 5L;
 
     public Long getNewId(){
         return newId++;

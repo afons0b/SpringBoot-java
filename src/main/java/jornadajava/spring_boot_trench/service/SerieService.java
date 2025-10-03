@@ -89,7 +89,8 @@ public class SerieService {
         var serieOptional = repository.findById(id);
 
         //aqui verificamos se serieOptional contem o objeto requisitado se sim ele se torna serieToUpdate, se nao, ele retorna um NOT FOUND
-        Serie serieToUpdate = serieOptional.orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "id nao encontrado"));
+        Serie serieToUpdate = serieOptional
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "id nao encontrado"));
 
         //aqui estamos delegando para o mapper o ato de modificar o objeto,
         //serieToUpdate é oq vamos modificar e putRequest é oq estamos dizendo oq vai ser modificado
@@ -112,9 +113,9 @@ public class SerieService {
 
     //transformar um dto postRequest para dominio
     public SerieGetResponse save(SeriePostRequest postRequest){
-        //um tratamento caso o id passado seja nulo
+        //um tratamento caso algum atributo do postRequest esteja nulo
         if (postRequest == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "os dados para salvar nao podem ser nulos");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "data to save cant be null");
         }
 
         //o mapper faz o trabalho mano de atualizar cada atributo post request em dominio

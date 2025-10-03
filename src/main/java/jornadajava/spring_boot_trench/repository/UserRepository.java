@@ -38,7 +38,7 @@ public class UserRepository {
 
     //o metodo promete retornar um Optional, basicamente ele ja trata de dar uma resposta caso o id nao exista
     //o optional se aplica somente se for somente um objeto
-    //eu poderia usar no findByName mas
+    //eu poderia usar no findByName mas é um alista de nomes
     public Optional<User> findById(Long id){
         for (int i = 0; i < userData.getUsers().size(); i++){
             User user = userData.getUsers().get(i);

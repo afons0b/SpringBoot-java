@@ -140,8 +140,6 @@ class SerieRepositoryTest {
 
         repository.save(serieParaAtualizar);
 
-        System.out.println("Nome gerado: " + serieParaAtualizar.getNome());
-        System.out.println("ID gerado: " + serieParaAtualizar.getId());
 
         Assertions.assertThat(serieParaAtualizar.getId()).isEqualTo(1L);
         Assertions.assertThat(serieParaAtualizar.getNome()).isEqualTo("Fate");

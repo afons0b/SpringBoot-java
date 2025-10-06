@@ -1,6 +1,7 @@
 package jornadajava.spring_boot_trench.repository;
 
 import jornadajava.spring_boot_trench.domain.User;
+import jornadajava.spring_boot_trench.response.UserGetResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -33,6 +34,7 @@ class UserRepositoryTest {
         var user4 = User.builder().id(4L).name("Antonio").idade(38).lastName("Hidaka").email("antoniohidaka@email.com").build();
         var user5 = User.builder().id(5L).name("Afonso").idade(24).lastName("Braga").email("afonsobaraga@email.com").build();
         userList.addAll(List.of(user1, user2, user3, user4, user5));
+
     }
 
     @Test

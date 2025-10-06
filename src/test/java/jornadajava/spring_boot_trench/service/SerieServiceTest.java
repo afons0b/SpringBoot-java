@@ -85,6 +85,7 @@ class SerieServiceTest {
         BDDMockito.when(repository.findByName("Duna")).thenReturn(dunaSerie);
 
         for (int i = 0; i < dunaSerie.size(); i++){
+
             BDDMockito.when(mapper.toSerieGetResponse(dunaSerie.get(i)))
                     .thenReturn(dunaResponse.get(i));
         }

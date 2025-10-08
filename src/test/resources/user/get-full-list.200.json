@@ -1,0 +1,37 @@
+[
+  {
+    "id": 1,
+    "name": "Afonso",
+    "idade": 24,
+    "lastName": "Braga",
+    "email": "afonsobaraga@email.com"
+  },
+  {
+    "id": 2,
+    "name": "Iuri",
+    "idade": 23,
+    "lastName": "Maciel",
+    "email": "Iurimaciel@email.com"
+  },
+  {
+    "id": 3,
+    "name": "Tales",
+    "idade": 20,
+    "lastName": "Ribeiro",
+    "email": "talesribeiro@email.com"
+  },
+  {
+    "id": 4,
+    "name": "Antonio",
+    "idade": 38,
+    "lastName": "Hidaka",
+    "email": "antoniohidaka@email.com"
+  },
+  {
+    "id": 5,
+    "name": "Afonso",
+    "idade": 24,
+    "lastName": "Braga",
+    "email": "afonsobaraga@email.com"
+  }
+]

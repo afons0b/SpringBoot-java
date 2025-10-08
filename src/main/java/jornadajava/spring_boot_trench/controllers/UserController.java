@@ -7,6 +7,7 @@ import jornadajava.spring_boot_trench.response.UserPostResponse;
 import jornadajava.spring_boot_trench.response.UserPutResponse;
 import jornadajava.spring_boot_trench.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
@@ -40,7 +41,7 @@ public class UserController {
     @PostMapping
     public ResponseEntity<UserPostResponse> save(@RequestBody UserPostRequest postRequest){
         UserPostResponse getPostResponse = service.saveUser(postRequest);
-        return ResponseEntity.ok(getPostResponse);
+        return ResponseEntity.status(HttpStatus.CREATED).body(getPostResponse);
     }
 
     @DeleteMapping("{id}")

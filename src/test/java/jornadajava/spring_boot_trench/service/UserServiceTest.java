@@ -1,12 +1,10 @@
 package jornadajava.spring_boot_trench.service;
 
-import jornadajava.spring_boot_trench.domain.Serie;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.mapper.UserMapper;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
 import jornadajava.spring_boot_trench.request.UserPutRequest;
-import jornadajava.spring_boot_trench.response.SerieGetResponse;
 import jornadajava.spring_boot_trench.response.UserGetResponse;
 import jornadajava.spring_boot_trench.response.UserPostResponse;
 import jornadajava.spring_boot_trench.response.UserPutResponse;
@@ -24,8 +22,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {

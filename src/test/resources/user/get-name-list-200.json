@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Afonso",
+    "idade": 24,
+    "lastName": "Braga",
+    "email": "afonsobaraga@email.com"
+  },
+  {
+    "id": 5,
+    "name": "Afonso",
+    "idade": 24,
+    "lastName": "Braga",
+    "email": "afonsobaraga@email.com"
+  }
+]

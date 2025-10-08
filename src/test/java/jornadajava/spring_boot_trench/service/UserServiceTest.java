@@ -4,8 +4,12 @@ import jornadajava.spring_boot_trench.domain.Serie;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.mapper.UserMapper;
 import jornadajava.spring_boot_trench.repository.UserRepository;
+import jornadajava.spring_boot_trench.request.UserPostRequest;
+import jornadajava.spring_boot_trench.request.UserPutRequest;
 import jornadajava.spring_boot_trench.response.SerieGetResponse;
 import jornadajava.spring_boot_trench.response.UserGetResponse;
+import jornadajava.spring_boot_trench.response.UserPostResponse;
+import jornadajava.spring_boot_trench.response.UserPutResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
@@ -112,12 +116,99 @@ class UserServiceTest {
 
         //ensinando ao mockito devolver um optional do user
         BDDMockito.when(repository.findById(user.getId())).thenReturn(Optional.of(user));
+        //como o mapper tbm esta mockado, temos q ensinar o mockito a mapear para dto
         //ensinando ao mockito a transformar para dto, enquando chamamos o mapper dizemos a ele retornar o userResponse
         BDDMockito.when(mapper.toUserGetResponse(user)).thenReturn(userResponse);
 
         UserGetResponse resultado = service.findById(user.getId());
 
         Assertions.assertThat(resultado).isEqualTo(userResponse);
+    }
+
+    @Test
+    @DisplayName("metodo para deletar um objeto pelo id")
+    @Order(4)
+    void deleteById_testMethod(){
+
+        User userToDelete = userListDomain.getFirst();
+
+        BDDMockito.when(repository.findById(userToDelete.getId()))
+                .thenReturn(Optional.of(userToDelete));
+
+        service.delete(userToDelete.getId());
+
+        BDDMockito.verify(repository, BDDMockito.times(1)).deleteById(userToDelete.getId());
+    }
+
+    @Test
+    @DisplayName("metodo para salvar um objeto na lista")
+    @Order(5)
+    void save_method_test(){
+
+        //chegada do POST request
+        UserPostRequest postRequest = UserPostRequest.builder()
+                .name("teste")
+                .lastName("service")
+                .idade(40)
+                .email("testeservice@gmail.com").build();
+
+        //POST request no banco
+        User userDomain = User.builder()
+                .id(4L)
+                .name("teste")
+                .lastName("service")
+                .idade(40)
+                .email("testeservice@gmail.com").build();
+
+        //retorno do user domain como dto post response
+        //postResponse era pra ter o id
+        //no futuro sera feita uma refatoração dos testes e da classe como um todo
+        UserPostResponse postResponse = UserPostResponse.builder().name("teste").lastName("service").idade(40).email("testeservice@gmail.com").build();
+
+        BDDMockito.when(mapper.toUser(postRequest)).thenReturn(userDomain);
+
+        BDDMockito.when(repository.save(userDomain)).thenReturn(userDomain);
+
+        BDDMockito.when(mapper.toUserPostResponse(userDomain)).thenReturn(postResponse);
+
+        UserPostResponse response = service.saveUser(postRequest);
+
+        Assertions.assertThat(response).isEqualTo(postResponse);
+        Assertions.assertThat(response.getId()).isEqualTo(userDomain.getId());
+    }
+
+    @Test
+    @DisplayName("metodo para atualizar um objeto usando DTO")
+    @Order(7)
+    void update_method(){
+        //chegada do putRequest
+        UserPutRequest putRequest = UserPutRequest.builder()
+                .name("update")
+                .lastName("method")
+                .idade(26)
+                .email("emailatualizado@gmail.com").build();
+
+        //pegamos o objeto a ser atualizado
+        User originalUser = userListDomain.getFirst();
+
+        //fazemos agora o o response do update para o cliente
+        UserPutResponse putResponse = UserPutResponse.builder()
+                .name("update")
+                .lastName("method")
+                .idade(26)
+                .email("emailatualizado@gmail.com").build();
+        BDDMockito.when(repository.findById(originalUser.getId()))
+                .thenReturn(Optional.of(originalUser));
+
+        BDDMockito.doNothing().when(mapper).UserToUpdate(putRequest, originalUser);
+
+        BDDMockito.when(repository.update(originalUser)).thenReturn(originalUser);
+
+        BDDMockito.when(mapper.toUserPutResponse(originalUser)).thenReturn(putResponse);
+
+        UserPutResponse resultado = service.update(originalUser.getId(), putRequest);
+
+        Assertions.assertThat(resultado).isEqualTo(putResponse);
     }
 
 }

@@ -11,6 +11,7 @@ import lombok.Setter;
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class UserPostResponse {
     @EqualsAndHashCode.Include
+    private Long id;
     private String name;
     private int idade;
     private String lastName;

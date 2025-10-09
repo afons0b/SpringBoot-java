@@ -1,5 +1,6 @@
 package jornadajava.spring_boot_trench.controllers;
 
+import jakarta.validation.Valid;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
 import jornadajava.spring_boot_trench.request.UserPutRequest;
 import jornadajava.spring_boot_trench.response.UserGetResponse;
@@ -9,7 +10,6 @@ import jornadajava.spring_boot_trench.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -39,7 +39,7 @@ public class UserController {
     }
 
     @PostMapping
-    public ResponseEntity<UserPostResponse> save(@RequestBody UserPostRequest postRequest){
+    public ResponseEntity<UserPostResponse> save(@RequestBody @Valid UserPostRequest postRequest){
         UserPostResponse getPostResponse = service.saveUser(postRequest);
         return ResponseEntity.status(HttpStatus.CREATED).body(getPostResponse);
     }

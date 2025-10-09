@@ -5,10 +5,14 @@ import jornadajava.spring_boot_trench.mapper.UserMapperImpl;
 import jornadajava.spring_boot_trench.repository.UserData;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.service.UserService;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Order;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
@@ -19,6 +23,7 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
@@ -26,7 +31,10 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 @WebMvcTest(controllers = UserController.class)
 @ComponentScan(basePackages = {"jornadajava.spring_boot_trench"})
@@ -161,6 +169,45 @@ class UserControllerTest {
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/user/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
+    }
+
+    @ParameterizedTest
+    @MethodSource("postMethodBadRequest")
+    @DisplayName("POST v1/user/ deve retornar um bad request quando os campos estiverem vazios")
+    @Order(6)
+    void save_method_returns_bad_request(String fileName, List<String> erros) throws Exception {
+
+        var request = readResourceLoader("user/%s".formatted(fileName));
+
+        MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
+                        .post("/v1/user")
+                        .content(request).contentType(MediaType.APPLICATION_JSON))
+
+                .andDo(MockMvcResultHandlers.print())
+                .andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andReturn();
+        var resolvedException = mvcResult.getResolvedException();
+
+        Assertions.assertThat(resolvedException).isNotNull();
+
+        //verificando se as 3 mensagens de alerta estão no resolved excepion
+        Assertions.assertThat(resolvedException.getMessage()).contains(erros);
+    }
+
+    private static Stream<Arguments> postMethodBadRequest(){
+        var nameRequiredError = "campo nome é necessario";
+        var lastNameRequiredError = "o campo lastName é necessario";
+        var emailRequiredError = "campo email é necessario";
+        var emailInvalidoError = "o email inserido é invalido";
+
+        var allErrors = List.of(nameRequiredError, lastNameRequiredError, emailRequiredError);
+        var emailError = Collections.singletonList(emailInvalidoError);
+
+        return Stream.of(
+                Arguments.of("save-request-user-empty-fields-400.json", allErrors),
+                Arguments.of("save-request-user-blank-fields-400.json", allErrors),
+                Arguments.of("post-user-request-email-invalid-400.json", emailError)
+        );
     }
 
 }

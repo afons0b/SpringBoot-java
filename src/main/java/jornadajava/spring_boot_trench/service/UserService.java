@@ -1,6 +1,7 @@
 package jornadajava.spring_boot_trench.service;
 
 import jornadajava.spring_boot_trench.domain.User;
+import jornadajava.spring_boot_trench.exception.NotFoundException;
 import jornadajava.spring_boot_trench.mapper.UserMapper;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
@@ -46,7 +47,7 @@ public class UserService {
 
         //aqui estou verificando se o objeto existe, se sim variavel user recebe optionalUser, se nao, exception é lançada
         User user = optionalUser
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "id not found"));
+                .orElseThrow(() -> new NotFoundException("id not found"));
         log.info("Showing user found by id {}", user);
 
         //mapeando objeto para DTO e retornando para o cliente
@@ -54,8 +55,16 @@ public class UserService {
     }
 
     public List<UserGetResponse> findByName(String name){
+        //tratamento de exceção
+        if (name.isEmpty()) {
+            throw new NotFoundException("o parametro name esta vazio");
+        }
         //aqui estamos criando a lista de nomes e chamando o metodo para adicionar todos os nomes requisitado pelo cliente(parametro name)
         List<User> filteredList = repository.findByName(name);
+
+        if (filteredList.isEmpty()) {
+            throw new NotFoundException("o nome: " + name + " inserido não existe");
+        }
 
         //criando a lista para a adicionar os objetos DTOs
         List<UserGetResponse> getResponse = new ArrayList<>();

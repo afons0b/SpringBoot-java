@@ -171,10 +171,13 @@ class UserControllerTest {
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
 
+    //parametrized test serve para testar o mesmo metodo mas com diferentes entradas,
+    //estamos testando a validação de campos diferentes usando o mesmo metodo
     @ParameterizedTest
     @MethodSource("postMethodBadRequest")
     @DisplayName("POST v1/user/ deve retornar um bad request quando os campos estiverem vazios")
     @Order(6)
+    //no metodo teremos um parametro string e uma lista
     void save_method_returns_bad_request(String fileName, List<String> erros) throws Exception {
 
         var request = readResourceLoader("user/%s".formatted(fileName));

@@ -3,6 +3,12 @@ spring:
     active: mysql
   application:
     name: spring-boot-trench
+  datasource:
+    url: jdbc:mysql://localhost:3307/user_service?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+    username: root
+    password: mysql123
+  jpa:
+    show-sql: true
 
   threads:
     virtual:

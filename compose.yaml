@@ -1,0 +1,14 @@
+services:
+  mysql:
+    image: mysql:9.4.0
+    environment:
+      MYSQL_ROOT_PASSWORD: mysql123
+      MYSQL_USER: afonso
+      MYSQL_PASSWORD: javinha
+    ports:
+      - "3307:3306"
+    volumes:
+      - javajourney-db:/var/lib/mysql
+
+volumes:
+  javajourney-db:

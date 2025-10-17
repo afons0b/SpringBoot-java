@@ -64,19 +64,10 @@ public class UserService {
             throw new NotFoundException("o nome: " + name + " inserido não existe");
         }
 
-        //criando a lista para a adicionar os objetos DTOs
-        List<UserGetResponse> getResponse = new ArrayList<>();
-        //percorrendo toda a lista de nomes
-        for (int i = 0; i < filteredList.size(); i++){
-            //a cada volta no loop, le o nome da lista
-            User user = filteredList.get(i);
-            //transformando os objetos para DTO e adicionando na lista criada
-            var dto = mapper.toUserGetResponse(user);
-            log.info("showing list of names {}", dto);
-            getResponse.add(dto);
-        }
-        //retornando a lista getResponse para o cliente
-        return getResponse;
+        return filteredList
+                .stream()
+                .map(mapper::toUserGetResponse)
+                .toList();
     }
 
     public void delete(Long id){

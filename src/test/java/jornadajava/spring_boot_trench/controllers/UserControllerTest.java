@@ -3,6 +3,7 @@ package jornadajava.spring_boot_trench.controllers;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.mapper.UserMapperImpl;
 import jornadajava.spring_boot_trench.repository.UserData;
+import jornadajava.spring_boot_trench.repository.UserHardCodedRepository;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.service.UserService;
 import org.assertj.core.api.Assertions;
@@ -31,7 +32,6 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Stream;
@@ -39,7 +39,7 @@ import java.util.stream.Stream;
 @WebMvcTest(controllers = UserController.class)
 @ComponentScan(basePackages = {"jornadajava.spring_boot_trench"})
 @ActiveProfiles("test")
-@Import({UserMapperImpl.class, UserService.class, UserRepository.class, UserData.class})
+@Import({UserMapperImpl.class, UserService.class, UserHardCodedRepository.class, UserData.class})
 class UserControllerTest {
     @Autowired
     //o MockMvc é como se fosse um postman mas emulado no teste, um postman de mentira
@@ -48,6 +48,9 @@ class UserControllerTest {
     @MockitoBean
     private UserData userData;
     private final List<User> userList = new ArrayList<>();
+
+    @MockitoBean
+    private UserRepository userRepository;
 
     @Autowired
     private ResourceLoader resourceLoader;
@@ -75,7 +78,7 @@ class UserControllerTest {
     @DisplayName("getAll deve retornar lista de DTOs")
     @Order(1)
     void getAll_retornaListaDeDtos() throws Exception {
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
+        BDDMockito.when(userRepository.findAll()).thenReturn(userList);
         var response = readResourceLoader("user/get-full-list.200.json");
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user"))

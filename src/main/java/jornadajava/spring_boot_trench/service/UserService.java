@@ -3,6 +3,7 @@ package jornadajava.spring_boot_trench.service;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.exception.NotFoundException;
 import jornadajava.spring_boot_trench.mapper.UserMapper;
+import jornadajava.spring_boot_trench.repository.UserHardCodedRepository;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
 import jornadajava.spring_boot_trench.request.UserPutRequest;
@@ -22,19 +23,16 @@ import java.util.List;
 @Service
 @Log4j2
 public class UserService {
-    private final UserRepository repository;
+    private final UserHardCodedRepository repository;
+    private final UserRepository userRepository;
     private final UserMapper mapper;
 
 
     public List<UserGetResponse> getAll(){
-        List<User> allList = repository.listAll(); // Puxa a lista uma unica vez
-        List<UserGetResponse> responseList = new ArrayList<>();
-        for (User user : allList){ // Percorre a lista que já está na memória
-            var dto = mapper.toUserGetResponse(user);
-            responseList.add(dto);
-            log.info("Showing list os users {}", dto);
-        }
-        return responseList;
+        return userRepository.findAll()
+                .stream()
+                .map(mapper::toUserGetResponse)
+                .toList();
     }
 
     public UserGetResponse findById(Long id){

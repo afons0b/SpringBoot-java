@@ -1,11 +1,9 @@
 package jornadajava.spring_boot_trench.repository;
 
 import jornadajava.spring_boot_trench.domain.User;
-import jornadajava.spring_boot_trench.response.UserGetResponse;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.mapstruct.control.MappingControl;
 import org.mockito.BDDMockito;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
@@ -13,8 +11,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
 import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 @ExtendWith(MockitoExtension.class)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
@@ -24,7 +20,7 @@ class UserRepositoryTest {
     private final List<User> userList = new ArrayList<>();
 
     @InjectMocks
-    private UserRepository repository;
+    private UserHardCodedRepository repository;
 
     @BeforeEach
     void init(){

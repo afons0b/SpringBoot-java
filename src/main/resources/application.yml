@@ -9,6 +9,8 @@ spring:
     password: mysql123
   jpa:
     show-sql: true
+    hibernate:
+      ddl-auto: update
 
   threads:
     virtual:

@@ -2,6 +2,7 @@ package jornadajava.spring_boot_trench.service;
 
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.mapper.UserMapper;
+import jornadajava.spring_boot_trench.repository.UserHardCodedRepository;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
 import jornadajava.spring_boot_trench.request.UserPutRequest;
@@ -27,9 +28,12 @@ import java.util.Optional;
 class UserServiceTest {
 
     @Mock
-    private UserRepository repository;
+    private UserHardCodedRepository repository;
     private final List<User> userListDomain = new ArrayList<>();
     private final List<UserGetResponse> userGetResponseList = new ArrayList<>();
+
+    @Mock
+    private UserRepository userRepository;
 
     @Mock
     private UserMapper mapper;
@@ -59,7 +63,7 @@ class UserServiceTest {
     @DisplayName("getAll deve retornar lista de DTOs")
     @Order(1)
     void getAll_comForLoop_retornaListaDeDtos(){
-        BDDMockito.when(repository.listAll()).thenReturn(userListDomain);
+        BDDMockito.when(userRepository.findAll()).thenReturn(userListDomain);
         //aqui percorremos ambas as listas e depois coletando cada objeto a cada volta
         for (int i = 0; i < userListDomain.size(); i++){
             User userDomain = userListDomain.get(i);

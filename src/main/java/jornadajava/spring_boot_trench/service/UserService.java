@@ -38,18 +38,11 @@ public class UserService {
     public UserGetResponse findById(Long id){
         //faço um tratamento caso o id nao exista
         if (id == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id cant be null or not exist");
+            throw new NotFoundException("id cant be null or not exist");
         }
         //OptionalUser recebe o objeto encntrado pelo id
-        java.util.Optional<User> optionalUser = repository.findById(id);
-
-        //aqui estou verificando se o objeto existe, se sim variavel user recebe optionalUser, se nao, exception é lançada
-        User user = optionalUser
-                .orElseThrow(() -> new NotFoundException("id not found"));
-        log.info("Showing user found by id {}", user);
-
-        //mapeando objeto para DTO e retornando para o cliente
-        return mapper.toUserGetResponse(user);
+        return userRepository.findById(id).map(mapper::toUserGetResponse)
+                .orElseThrow(()-> new NotFoundException("user not found"));
     }
 
     public List<UserGetResponse> findByName(String name){
@@ -57,8 +50,8 @@ public class UserService {
         if (name.isEmpty()) {
             throw new NotFoundException("o parametro name esta vazio");
         }
-        //aqui estamos criando a lista de nomes e chamando o metodo para adicionar todos os nomes requisitado pelo cliente(parametro name)
-        List<User> filteredList = repository.findByName(name);
+
+        List<User> filteredList = userRepository.findByNameIgnoreCase(name);
 
         if (filteredList.isEmpty()) {
             throw new NotFoundException("o nome: " + name + " inserido não existe");
@@ -72,29 +65,27 @@ public class UserService {
 
     public void delete(Long id){
         if (id == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id cant be null");
+            throw new NotFoundException("id cant be null");
         }
-        var userOptional = repository.findById(id);
+        User userToDelete = userRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("id not found"));
 
-        User userToDelete = userOptional
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "id not found"));
-
-        repository.deleteById(userToDelete.getId());
+        userRepository.delete(userToDelete);
         log.info("User deleted {}", userToDelete);
         return;
     }
 
     public UserPutResponse update(Long id, UserPutRequest putRequest){
         if (id == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "id cant be null");
+            throw new NotFoundException("id cant be null");
         }
 
-        var userOptional = repository.findById(id);
-        User userToUpdate = userOptional
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "id nao eoncontrado"));
+        var userToUpdate = userRepository.findById(id)
+                .orElseThrow(()-> new NotFoundException("id not found"));
+
 
         mapper.UserToUpdate(putRequest, userToUpdate);
-        User updatedUser = repository.update(userToUpdate);
+        User updatedUser = userRepository.save(userToUpdate);
         log.info("User updated {}", updatedUser);
 
         return mapper.toUserPutResponse(updatedUser);
@@ -102,7 +93,7 @@ public class UserService {
 
     public UserPostResponse saveUser(UserPostRequest postRequest){
         if (postRequest == null){
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "you need to fill in all the atributtes");
+            throw new NotFoundException("you need to fill in all the atributtes");
         }
 
         //user recebe postRequest mapeado para dominio
@@ -110,7 +101,7 @@ public class UserService {
         //setamos id para null
         user.setId(null);
         //salvamos o user no repoitorio
-        User savedUser = repository.save(user);
+        User savedUser = userRepository.save(user);
         log.info("User created with id {}", savedUser.getId());
         //retornamos para o cliente oq foi salvo
         return mapper.toUserPostResponse(savedUser);

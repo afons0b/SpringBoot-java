@@ -1,5 +1,6 @@
 package jornadajava.spring_boot_trench.controllers;
 
+import static org.mockito.BDDMockito.any;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.mapper.UserMapperImpl;
 import jornadajava.spring_boot_trench.repository.UserData;
@@ -34,6 +35,7 @@ import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Stream;
 
 @WebMvcTest(controllers = UserController.class)
@@ -91,6 +93,9 @@ class UserControllerTest {
                 // ou seja alguem esta dando um get all e vai receber um json completo,
                 //entao "esse assertion" compara o json emulado com o json do arquivo response
                 //e verifica se ambos sao iguais, se for o teste passa
+                //isso se aplica para outros metodos
+                //imagine que voce esta vendo outra pessoa executando cada metodo e recebendo uma resposta
+                //como dev, voce deve comparar a resposta do cliente com a sua
                 .andExpect(MockMvcResultMatchers.content().json(response));
 
     }
@@ -99,10 +104,13 @@ class UserControllerTest {
     @DisplayName("GET V1/user?nome=Afonso retorna uma lista de objetos com esse nome")
     @Order(2)
     void get_name_filtered() throws Exception{
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
 
         var response = readResourceLoader("user/get-name-list-200.json");
         var name = "Afonso";
+        var afonso = userList.stream().filter(user -> user.getName().equals(name)).toList();
+
+        BDDMockito.when(userRepository.findByNameIgnoreCase(name)).thenReturn(afonso);
+
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user/filter").param("name", name))
                 .andDo(MockMvcResultHandlers.print())
@@ -114,9 +122,12 @@ class UserControllerTest {
     @DisplayName("GET v1/user/1 retorna um objeto com id passado")
     @Order(3)
     void findById_ReturnSeriePorId_quandoSucesso() throws Exception {
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
-        var id = 1L;
+
         var response = readResourceLoader("user/get-user-by-id.json");
+        var id = 1L;
+        var foundUser = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
+        BDDMockito.when(userRepository.findById(id)).thenReturn(foundUser);
+
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
@@ -130,44 +141,63 @@ class UserControllerTest {
     void save_method() throws Exception {
 
         var request = readResourceLoader("user/save-request-user-201.json");
+        var response = readResourceLoader("user/save-response-user-201.json");
+
+        User savedUser = User.builder()
+                .id(6L)
+                .name("Carlos")
+                .lastName("dev")
+                .idade(30)
+                .email("carlosdev@email.com").build();
+
+        BDDMockito.when(userRepository.save(any(User.class))).thenReturn(savedUser);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/user")
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("Carlos"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("dev"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.idade").value(30))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("carlosdev@email.com"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
+
     }
 
     @Test
     @DisplayName("metodo para testar atualizar um objeto usando DTO")
     @Order(5)
     void update_method() throws Exception {
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
         var request = readResourceLoader("user/put-request-user-201.json");
+        var response = readResourceLoader("user/put-request-user-201.json");
+
         var id = 1L;
+        User originalUser = userList.getFirst();
+
+        //dizemos para o mockito, qndo ele encontrar o id 1L,
+        //ele retorne a variavel originalUser
+        BDDMockito.when(userRepository.findById(id))
+                .thenReturn(Optional.of(originalUser));
+
+        //quando atualizamos o variavel,
+        //retornamos ela mesma pois nosso metodo retorna uma resposta para o cliente
+        BDDMockito.when(userRepository.save(originalUser))
+                .thenReturn(originalUser);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/v1/user/{id}", id)
                         .content(request)
-                        .contentType(MediaType.APPLICATION_JSON)).andDo(MockMvcResultHandlers.print())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
 
-                .andExpect(MockMvcResultMatchers.jsonPath("$.name").value("eduardo"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName").value("devsenior"))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.idade").value(60))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email").value("eduardodev@email.com"));
+                .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
     @Test
     @DisplayName("metodo para deletar um objeto pelo id")
     @Order(5)
     void deleteById_testMethod() throws Exception {
-        BDDMockito.when(userData.getUsers()).thenReturn(userList);
 
         var id = userList.getFirst().getId();
+        var foundUser = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
+        BDDMockito.when(userRepository.findById(id)).thenReturn(foundUser);
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/user/{id}", id))
                 .andDo(MockMvcResultHandlers.print())

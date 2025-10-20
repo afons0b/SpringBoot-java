@@ -28,12 +28,9 @@ import java.util.Optional;
 class UserServiceTest {
 
     @Mock
-    private UserHardCodedRepository repository;
+    private UserRepository repository;
     private final List<User> userListDomain = new ArrayList<>();
     private final List<UserGetResponse> userGetResponseList = new ArrayList<>();
-
-    @Mock
-    private UserRepository userRepository;
 
     @Mock
     private UserMapper mapper;
@@ -63,7 +60,7 @@ class UserServiceTest {
     @DisplayName("getAll deve retornar lista de DTOs")
     @Order(1)
     void getAll_comForLoop_retornaListaDeDtos(){
-        BDDMockito.when(userRepository.findAll()).thenReturn(userListDomain);
+        BDDMockito.when(repository.findAll()).thenReturn(userListDomain);
         //aqui percorremos ambas as listas e depois coletando cada objeto a cada volta
         for (int i = 0; i < userListDomain.size(); i++){
             User userDomain = userListDomain.get(i);
@@ -90,7 +87,7 @@ class UserServiceTest {
         List<User> usersDomain = List.of(userListDomain.get(0), userListDomain.get(4));
         List<UserGetResponse> usersResponse = List.of(userGetResponseList.get(0), userGetResponseList.get(4));
 
-        BDDMockito.when(repository.findByName("Afonso")).thenReturn(usersDomain);
+        BDDMockito.when(repository.findByNameIgnoreCase("Afonso")).thenReturn(usersDomain);
 
         // um loop para percorrer todos os objetos da lista usersDomain
         for (int i = 0; i < usersDomain.size(); i++){
@@ -137,7 +134,7 @@ class UserServiceTest {
 
         service.delete(userToDelete.getId());
 
-        BDDMockito.verify(repository, BDDMockito.times(1)).deleteById(userToDelete.getId());
+        BDDMockito.verify(repository, BDDMockito.times(1)).delete(userToDelete);
     }
 
     @Test
@@ -202,7 +199,7 @@ class UserServiceTest {
 
         BDDMockito.doNothing().when(mapper).UserToUpdate(putRequest, originalUser);
 
-        BDDMockito.when(repository.update(originalUser)).thenReturn(originalUser);
+        BDDMockito.when(repository.save(originalUser)).thenReturn(originalUser);
 
         BDDMockito.when(mapper.toUserPutResponse(originalUser)).thenReturn(putResponse);
 

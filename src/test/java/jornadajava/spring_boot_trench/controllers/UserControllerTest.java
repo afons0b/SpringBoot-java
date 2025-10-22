@@ -47,8 +47,6 @@ class UserControllerTest {
     //o MockMvc é como se fosse um postman mas emulado no teste, um postman de mentira
     private MockMvc mockMvc;
 
-    @MockitoBean
-    private UserData userData;
     private final List<User> userList = new ArrayList<>();
 
     @MockitoBean

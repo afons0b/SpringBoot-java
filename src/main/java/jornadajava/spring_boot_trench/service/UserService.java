@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
@@ -28,6 +29,7 @@ public class UserService {
     private final UserMapper mapper;
 
 
+    @Transactional(readOnly = true)
     public List<UserGetResponse> getAll(){
         return userRepository.findAll()
                 .stream()
@@ -35,6 +37,7 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public UserGetResponse findById(Long id){
         //faço um tratamento caso o id nao exista
         if (id == null){
@@ -45,6 +48,7 @@ public class UserService {
                 .orElseThrow(()-> new NotFoundException("user not found"));
     }
 
+    @Transactional(readOnly = true)
     public List<UserGetResponse> findByName(String name){
         //tratamento de exceção
         if (name.isEmpty()) {
@@ -63,6 +67,10 @@ public class UserService {
                 .toList();
     }
 
+    @Transactional
+      //Executa esta anotação faz uma transação de banco de dados gerenciada pelo Spring.
+      //Isso assegura a atomicidade (todas as operações de banco de dados neste método são concluídas com sucesso ou nenhuma delas é aplicada permanentemente)
+      //e a consistência dos dados, fazendo rollback por padrão em caso de RuntimeExceptions.
     public void delete(Long id){
         if (id == null){
             throw new NotFoundException("id cant be null");
@@ -75,10 +83,12 @@ public class UserService {
         return;
     }
 
+    @Transactional
     public UserPutResponse update(Long id, UserPutRequest putRequest){
         if (id == null){
             throw new NotFoundException("id cant be null");
         }
+        assertEmailDoesNotExist(putRequest.getEmail(), id);
 
         var userToUpdate = userRepository.findById(id)
                 .orElseThrow(()-> new NotFoundException("id not found"));
@@ -91,10 +101,9 @@ public class UserService {
         return mapper.toUserPutResponse(updatedUser);
     }
 
+    @Transactional
     public UserPostResponse saveUser(UserPostRequest postRequest){
-        if (postRequest == null){
-            throw new NotFoundException("you need to fill in all the atributtes");
-        }
+        assertEmailDoesNotExist(postRequest.getEmail());
 
         //user recebe postRequest mapeado para dominio
         User user = mapper.toUser(postRequest);
@@ -105,6 +114,22 @@ public class UserService {
         log.info("User created with id {}", savedUser.getId());
         //retornamos para o cliente oq foi salvo
         return mapper.toUserPostResponse(savedUser);
+    }
+
+    public void assertEmailDoesNotExist(String email){
+        userRepository.findByEmail(email)
+                .ifPresent(user -> {
+                    throwEmailExistsException();
+                });
+    }
+
+    public void assertEmailDoesNotExist(String email, Long id){
+        userRepository.findByEmailAndIdNot(email, id)
+                .ifPresent(user -> {throwEmailExistsException();});
+    }
+
+    private static void throwEmailExistsException() {
+        throw new ResponseStatusException(HttpStatus.CONFLICT, "este email ja existe");
     }
 
 }

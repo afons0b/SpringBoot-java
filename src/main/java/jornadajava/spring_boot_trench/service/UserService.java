@@ -12,6 +12,8 @@ import jornadajava.spring_boot_trench.response.UserPostResponse;
 import jornadajava.spring_boot_trench.response.UserPutResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,11 +32,18 @@ public class UserService {
 
 
     @Transactional(readOnly = true)
-    public List<UserGetResponse> getAll(){
+    public List<UserGetResponse> findAll(){
         return userRepository.findAll()
                 .stream()
                 .map(mapper::toUserGetResponse)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserGetResponse> findAllPaginated(Pageable pageable){
+        var userPage = userRepository.findAll(pageable);
+
+        return userPage.map(mapper::toUserGetResponse);
     }
 
     @Transactional(readOnly = true)

@@ -21,6 +21,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
@@ -242,6 +245,22 @@ class UserControllerTest {
                 Arguments.of("save-request-user-blank-fields-400.json", allErrors),
                 Arguments.of("post-user-request-email-invalid-400.json", emailError)
         );
+    }
+
+    @Test
+    @DisplayName("getAll deve retornar lista de DTOs paginadas quando requisitadas")
+    @Order(7)
+    void getAll_retornaListaDeDtos_paginadas() throws Exception {
+        var response = readResourceLoader("user/get-paginated-list.200.json");
+        var pageRequest = PageRequest.of(0 ,userList.size());
+        var userPage = new PageImpl<>(userList, pageRequest, userList.size());
+
+        BDDMockito.when(userRepository.findAll(BDDMockito.any(Pageable.class))).thenReturn(userPage);
+
+        mockMvc.perform(MockMvcRequestBuilders.get("/v1/user/paginated"))
+                .andExpect(MockMvcResultMatchers.status().isOk())
+                .andExpect(MockMvcResultMatchers.content().json(response));
+
     }
 
 }

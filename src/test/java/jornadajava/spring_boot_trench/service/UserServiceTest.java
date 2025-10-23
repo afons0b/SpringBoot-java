@@ -23,6 +23,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.IntStream;
 
 @ExtendWith(MockitoExtension.class)
 class UserServiceTest {
@@ -61,22 +62,17 @@ class UserServiceTest {
     @Order(1)
     void getAll_comForLoop_retornaListaDeDtos(){
         BDDMockito.when(repository.findAll()).thenReturn(userListDomain);
-        //aqui percorremos ambas as listas e depois coletando cada objeto a cada volta
-        for (int i = 0; i < userListDomain.size(); i++){
-            User userDomain = userListDomain.get(i);
-            UserGetResponse userResponse = userGetResponseList.get(i);
 
-            // e "ensinamos" o mapper a fazer o mapeamento
-            BDDMockito.when(mapper.toUserGetResponse(userDomain)).thenReturn(userResponse);
-        }
+        IntStream.range(0, userListDomain.size())
+                .forEach(i->{var userDomain = userListDomain.get(i);
+                    var responseList = userGetResponseList.get(i);
+                BDDMockito.when(mapper.toUserGetResponse(userDomain)).thenReturn(responseList);
+                });
+        var result = service.findAll();
 
-        List<UserGetResponse> resultado = service.getAll();
-
-        Assertions.assertThat(resultado).isNotNull();
-
-        Assertions.assertThat(resultado).isEqualTo(userGetResponseList);
-
-        Assertions.assertThat(resultado).hasSize(5);
+        Assertions.assertThat(result).isNotNull();
+        Assertions.assertThat(result).isEqualTo(userGetResponseList);
+        Assertions.assertThat(result).hasSize(5);
     }
 
     @Test
@@ -99,7 +95,6 @@ class UserServiceTest {
         var resultado = service.findByName("Afonso");
 
         Assertions.assertThat(resultado).hasSize(2);
-
         Assertions.assertThat(resultado).isEqualTo(usersResponse);
     }
 

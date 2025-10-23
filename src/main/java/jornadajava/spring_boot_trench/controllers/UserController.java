@@ -10,6 +10,8 @@ import jornadajava.spring_boot_trench.response.UserPostResponse;
 import jornadajava.spring_boot_trench.response.UserPutResponse;
 import jornadajava.spring_boot_trench.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -25,7 +27,15 @@ public class UserController {
     @GetMapping
     public ResponseEntity<List<UserGetResponse>> findAll(){
 
-        List<UserGetResponse> getResponseList = service.getAll();
+        List<UserGetResponse> getResponseList = service.findAll();
+
+        return ResponseEntity.ok(getResponseList);
+    }
+
+    @GetMapping("/paginated")
+    public ResponseEntity<Page<UserGetResponse>> findAllpaginated(Pageable pageable){
+
+        var getResponseList = service.findAllPaginated(pageable);
 
         return ResponseEntity.ok(getResponseList);
     }

@@ -1,10 +1,8 @@
 package jornadajava.spring_boot_trench.repository;
 
-import jornadajava.spring_boot_trench.domain.Serie;
 import jornadajava.spring_boot_trench.domain.User;
 import org.springframework.stereotype.Component;
 
-import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 

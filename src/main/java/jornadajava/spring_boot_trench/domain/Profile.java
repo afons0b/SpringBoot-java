@@ -4,8 +4,11 @@ import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
 @Builder
-@Data
 @EqualsAndHashCode(onlyExplicitlyIncluded = true)
 public class Profile {
     @EqualsAndHashCode.Include

@@ -1,14 +1,9 @@
 package jornadajava.spring_boot_trench.service;
 
-import jornadajava.spring_boot_trench.domain.Profile;
 import jornadajava.spring_boot_trench.domain.UserProfile;
-import jornadajava.spring_boot_trench.exception.NotFoundException;
-import jornadajava.spring_boot_trench.mapper.ProfileMapper;
-import jornadajava.spring_boot_trench.repository.ProfileRepository;
+import jornadajava.spring_boot_trench.mapper.UserProfileMapper;
 import jornadajava.spring_boot_trench.repository.UserProfileRepository;
-import jornadajava.spring_boot_trench.request.ProfilePostRequest;
-import jornadajava.spring_boot_trench.response.ProfileGetResponse;
-import jornadajava.spring_boot_trench.response.ProfilePostResponse;
+import jornadajava.spring_boot_trench.response.UserProfileUserGetResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
@@ -22,11 +17,21 @@ import java.util.List;
 public class UserProfileService {
 
     private final UserProfileRepository repository;
+    private final UserProfileMapper mapper;
 
     @Transactional(readOnly = true)
     public List<UserProfile> findAll(){
         return repository.findAll()
                 .stream()
+                .toList();
+    }
+
+    @Transactional
+    public List<UserProfileUserGetResponse> findUsersByProfileId(Long id){
+        return repository.findByProfileId(id)
+                .stream()
+                .map(UserProfile::getUser)
+                .map(mapper::toUserProfileUserGetResponse)
                 .toList();
     }
 

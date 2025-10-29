@@ -8,9 +8,11 @@ spring:
     username: root
     password: mysql123
   jpa:
-    show-sql: true
+    show-sql: false
     hibernate:
       ddl-auto: update
+    properties:
+      hibernate.format_sql: false
 
   threads:
     virtual:
@@ -22,4 +24,13 @@ server:
 
 logging:
   level:
-    org.hibernate.orm.jdbc.bind: trace
+    #org.hibernate.orm.jdbc.bind: trace
+    net.ttddyy.dsproxy.listener: debug
+    org.hibernate.SQL: OFF
+
+decorator:
+  datasource:
+    datasource-proxy:
+      format-sql: true
+      slow-query:
+        threshold: 1000

@@ -1,11 +1,15 @@
 package jornadajava.spring_boot_trench.controllers;
 
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.any;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.mapper.UserMapperImpl;
-import jornadajava.spring_boot_trench.repository.UserData;
-import jornadajava.spring_boot_trench.repository.UserHardCodedRepository;
 import jornadajava.spring_boot_trench.repository.UserRepository;
+import jornadajava.spring_boot_trench.request.UserPostRequest;
+import jornadajava.spring_boot_trench.request.UserPutRequest;
+import jornadajava.spring_boot_trench.response.UserGetResponse;
+import jornadajava.spring_boot_trench.response.UserPostResponse;
+import jornadajava.spring_boot_trench.response.UserPutResponse;
 import jornadajava.spring_boot_trench.service.UserService;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -18,7 +22,6 @@ import org.junit.jupiter.params.provider.MethodSource;
 import org.mockito.BDDMockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
-import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.data.domain.PageImpl;
@@ -42,30 +45,29 @@ import java.util.Optional;
 import java.util.stream.Stream;
 
 @WebMvcTest(controllers = UserController.class)
-@ComponentScan(basePackages = {"jornadajava.spring_boot_trench"})
 @ActiveProfiles("test")
-@Import({UserMapperImpl.class, UserService.class, UserHardCodedRepository.class, UserData.class})
+@Import({UserMapperImpl.class})
 class UserControllerTest {
     @Autowired
     //o MockMvc é como se fosse um postman mas emulado no teste, um postman de mentira
     private MockMvc mockMvc;
 
-    private final List<User> userList = new ArrayList<>();
+    private final List<UserGetResponse> userGetResponseList = new ArrayList<>();
 
     @MockitoBean
-    private UserRepository userRepository;
+    private UserService service;
 
     @Autowired
     private ResourceLoader resourceLoader;
 
     @BeforeEach
     void init(){
-        var user1 = User.builder().id(1L).name("Afonso").idade(24).lastName("Braga").email("afonsobaraga@email.com").build();
-        var user2 = User.builder().id(2L).name("Iuri").idade(23).lastName("Maciel").email("Iurimaciel@email.com").build();
-        var user3 = User.builder().id(3L).name("Tales").idade(20).lastName("Ribeiro").email("talesribeiro@email.com").build();
-        var user4 = User.builder().id(4L).name("Antonio").idade(38).lastName("Hidaka").email("antoniohidaka@email.com").build();
-        var user5 = User.builder().id(5L).name("Afonso").idade(24).lastName("Braga").email("afonsobaraga@email.com").build();
-        userList.addAll(List.of(user1, user2, user3, user4, user5));
+        var user1 = UserGetResponse.builder().id(1L).name("Afonso").idade(24).lastName("Braga").email("afonsobaraga@email.com").build();
+        var user2 = UserGetResponse.builder().id(2L).name("Iuri").idade(23).lastName("Maciel").email("Iurimaciel@email.com").build();
+        var user3 = UserGetResponse.builder().id(3L).name("Tales").idade(20).lastName("Ribeiro").email("talesribeiro@email.com").build();
+        var user4 = UserGetResponse.builder().id(4L).name("Antonio").idade(38).lastName("Hidaka").email("antoniohidaka@email.com").build();
+        var user5 = UserGetResponse.builder().id(5L).name("Afonso").idade(24).lastName("Braga").email("afonsobaraga@email.com").build();
+        userGetResponseList.addAll(List.of(user1, user2, user3, user4, user5));
     }
 
     private String readResourceLoader(String fileName) throws IOException {
@@ -81,7 +83,7 @@ class UserControllerTest {
     @DisplayName("getAll deve retornar lista de DTOs")
     @Order(1)
     void getAll_retornaListaDeDtos() throws Exception {
-        BDDMockito.when(userRepository.findAll()).thenReturn(userList);
+        BDDMockito.when(service.findAll()).thenReturn(userGetResponseList);
         var response = readResourceLoader("user/get-full-list.200.json");
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user"))
@@ -108,9 +110,10 @@ class UserControllerTest {
 
         var response = readResourceLoader("user/get-name-list-200.json");
         var name = "Afonso";
-        var afonso = userList.stream().filter(user -> user.getName().equals(name)).toList();
+        List<UserGetResponse> afonso = userGetResponseList.stream()
+                .filter(userGetResponse -> userGetResponse.getName().equals(name)).toList();
 
-        BDDMockito.when(userRepository.findByNameIgnoreCase(name)).thenReturn(afonso);
+        BDDMockito.when(service.findByName(name)).thenReturn(afonso);
 
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user/filter").param("name", name))
@@ -126,8 +129,8 @@ class UserControllerTest {
 
         var response = readResourceLoader("user/get-user-by-id.json");
         var id = 1L;
-        var foundUser = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
-        BDDMockito.when(userRepository.findById(id)).thenReturn(foundUser);
+        var foundUser = userGetResponseList.getFirst();
+        BDDMockito.when(service.findById(id)).thenReturn(foundUser);
 
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user/{id}", id))
@@ -144,14 +147,14 @@ class UserControllerTest {
         var request = readResourceLoader("user/save-request-user-201.json");
         var response = readResourceLoader("user/save-response-user-201.json");
 
-        User savedUser = User.builder()
+        UserPostResponse savedUser = UserPostResponse.builder()
                 .id(6L)
                 .name("Carlos")
                 .lastName("dev")
                 .idade(30)
                 .email("carlosdev@email.com").build();
 
-        BDDMockito.when(userRepository.save(any(User.class))).thenReturn(savedUser);
+        BDDMockito.when(service.saveUser(any(UserPostRequest.class))).thenReturn(savedUser);
 
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/user")
                         .content(request)
@@ -159,7 +162,6 @@ class UserControllerTest {
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().json(response));
-
     }
 
     @Test
@@ -170,24 +172,20 @@ class UserControllerTest {
         var response = readResourceLoader("user/put-request-user-201.json");
 
         var id = 1L;
-        User originalUser = userList.getFirst();
+        UserPutResponse putResponse = UserPutResponse.builder()
+                .name("eduardo")
+                .lastName("devsenior")
+                .idade(60)
+                .email("eduardodev@email.com").build();
 
-        //dizemos para o mockito, qndo ele encontrar o id 1L,
-        //ele retorne a variavel originalUser
-        BDDMockito.when(userRepository.findById(id))
-                .thenReturn(Optional.of(originalUser));
-
-        //quando atualizamos o variavel,
-        //retornamos ela mesma pois nosso metodo retorna uma resposta para o cliente
-        BDDMockito.when(userRepository.save(originalUser))
-                .thenReturn(originalUser);
+        BDDMockito.when(service.update(eq(id), any(UserPutRequest.class)))
+                .thenReturn(putResponse);
 
         mockMvc.perform(MockMvcRequestBuilders.put("/v1/user/{id}", id)
                         .content(request)
                         .contentType(MediaType.APPLICATION_JSON))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
-
                 .andExpect(MockMvcResultMatchers.content().json(response));
     }
 
@@ -196,9 +194,9 @@ class UserControllerTest {
     @Order(5)
     void deleteById_testMethod() throws Exception {
 
-        var id = userList.getFirst().getId();
-        var foundUser = userList.stream().filter(user -> user.getId().equals(id)).findFirst();
-        BDDMockito.when(userRepository.findById(id)).thenReturn(foundUser);
+        var id = userGetResponseList.getFirst().getId();
+
+        BDDMockito.doNothing().when(service).delete(eq(id));
 
         mockMvc.perform(MockMvcRequestBuilders.delete("/v1/user/{id}", id))
                 .andDo(MockMvcResultHandlers.print())
@@ -252,10 +250,10 @@ class UserControllerTest {
     @Order(7)
     void getAll_retornaListaDeDtos_paginadas() throws Exception {
         var response = readResourceLoader("user/get-paginated-list.200.json");
-        var pageRequest = PageRequest.of(0 ,userList.size());
-        var userPage = new PageImpl<>(userList, pageRequest, userList.size());
+        var pageRequest = PageRequest.of(0 , userGetResponseList.size());
+        var userPage = new PageImpl<>(userGetResponseList, pageRequest, userGetResponseList.size());
 
-        BDDMockito.when(userRepository.findAll(BDDMockito.any(Pageable.class))).thenReturn(userPage);
+        BDDMockito.when(service.findAllPaginated(BDDMockito.any(Pageable.class))).thenReturn(userPage);
 
         mockMvc.perform(MockMvcRequestBuilders.get("/v1/user/paginated"))
                 .andExpect(MockMvcResultMatchers.status().isOk())

@@ -1,6 +1,6 @@
 package jornadajava.spring_boot_trench.controllers;
 
-import jornadajava.spring_boot_trench.domain.Profile;
+import jornadajava.spring_boot_trench.config.TestcontainersConfiguration;
 import jornadajava.spring_boot_trench.request.ProfilePostRequest;
 import jornadajava.spring_boot_trench.response.ProfileGetResponse;
 import jornadajava.spring_boot_trench.response.ProfilePostResponse;
@@ -9,12 +9,14 @@ import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
+import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -22,13 +24,15 @@ import java.util.List;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
+@Transactional
+@Import(TestcontainersConfiguration.class)
 class ProfileControllerIt {
     private static final String URL = "/v1/profile";
     @Autowired
     private TestRestTemplate restTemplate;
 
     @Test
-    @DisplayName("")
+    @DisplayName("GET")
     //2
     @Sql("/sql/init_2_profiles.sql")
     @Order(1)
@@ -52,7 +56,7 @@ class ProfileControllerIt {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("GET")
     @Order(2)
     void findAll_returns_emptyList(){
         var typeReference = new ParameterizedTypeReference<List<ProfileGetResponse>>(){
@@ -67,7 +71,7 @@ class ProfileControllerIt {
     }
 
     @Test
-    @DisplayName("")
+    @DisplayName("POST")
     @Order(3)
     void saves_aNew_object(){
         var profileToSave = ProfilePostRequest.builder()

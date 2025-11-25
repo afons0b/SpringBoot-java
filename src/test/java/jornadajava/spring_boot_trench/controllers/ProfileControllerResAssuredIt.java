@@ -58,4 +58,19 @@ class ProfileControllerResAssuredIt {
                 .log().all();
     }
 
+    @Test
+    @DisplayName("POST")
+    @Order(2)
+    void saveMethod_Create_A_Profile_WhemSucessful() throws Exception{
+        var request = fileUtils.readResourceFile("profile/post-request-200.json");
+        var response = fileUtils.readResourceFile("profile/post-response-200.json");
+
+        RestAssured.given().contentType(ContentType.JSON).accept(ContentType.JSON)
+                .body(request)
+                .when()
+                .post(URL)
+                .then().statusCode(HttpStatus.CREATED.value())
+                .body(Matchers.equalTo(response)).log().all();
+    }
+
 }

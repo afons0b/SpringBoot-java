@@ -1,5 +1,8 @@
 package jornadajava.spring_boot_trench.controllers;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.validation.Valid;
 import jornadajava.spring_boot_trench.exception.ErrorDefaultMessage;
 import jornadajava.spring_boot_trench.exception.NotFoundException;
@@ -25,6 +28,10 @@ public class UserController {
     private final UserService service;
 
     @GetMapping
+    @Operation(summary = "get all users", description = "get all users available in the system", responses = {
+            @ApiResponse(description = "List all users",
+                    responseCode = "200", content = @Content)
+    })
     public ResponseEntity<List<UserGetResponse>> findAll(){
 
         List<UserGetResponse> getResponseList = service.findAll();

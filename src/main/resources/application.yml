@@ -1,4 +1,8 @@
 spring:
+  security:
+    user:
+      name: user
+      password: afonso123
   profiles:
     active: mysql
   application:

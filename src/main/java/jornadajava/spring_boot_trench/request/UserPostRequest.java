@@ -19,5 +19,7 @@ public class UserPostRequest {
     //anotação @Email valida o campo email e verificar se o email atende a expressão valida
     @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,8}$",message = "o email inserido é invalido")
     private String email;
+    @NotBlank(message = "campo password é necessario")
+    private String password;
 
 }

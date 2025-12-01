@@ -59,8 +59,9 @@ public class SecurityConfig {
                 (auth -> auth.requestMatchers(WHITE_LIST)
                         //lista sendo autorizada cm permitAll
                         .permitAll()
-                        .requestMatchers(HttpMethod.GET,"v1/user").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.POST, "v1/user").permitAll()
+                        .requestMatchers(HttpMethod.GET,"/v1/user").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/v1/user").permitAll()
+                        .requestMatchers(HttpMethod.DELETE, "/v1/user/*").hasRole("ADMIN")
                         //porem para cada outra requisição, solicite autorização
                         .anyRequest()
                         //este httpBasic nada mais é que aquele pop up do navegador que solicita login e senha

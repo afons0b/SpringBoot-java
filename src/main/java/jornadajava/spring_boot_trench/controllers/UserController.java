@@ -3,6 +3,7 @@ package jornadajava.spring_boot_trench.controllers;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jornadajava.spring_boot_trench.exception.ErrorDefaultMessage;
 import jornadajava.spring_boot_trench.exception.NotFoundException;
@@ -24,6 +25,7 @@ import java.util.List;
 @RestController
 @RequestMapping("v1/user")
 @RequiredArgsConstructor
+@SecurityRequirement(name = "basicAuth")
 public class UserController {
     private final UserService service;
 

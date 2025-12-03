@@ -1,5 +1,6 @@
 package jornadajava.spring_boot_trench.mapper;
 
+import jornadajava.spring_boot_trench.annotation.EncodeMapping;
 import jornadajava.spring_boot_trench.domain.User;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
 import jornadajava.spring_boot_trench.request.UserPutRequest;
@@ -12,7 +13,8 @@ import org.mapstruct.MappingConstants;
 import org.mapstruct.MappingTarget;
 
 //transformando o mapper em um bean para fazer injeção de dependencia
-@Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
+@Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
+        uses = PassWordEncoderMapper.class)
 public interface UserMapper {
     // por que estamos usando o mapper?
     // mapper serv para mapear atributos e poupar tempo
@@ -22,6 +24,8 @@ public interface UserMapper {
 
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "roles", constant = "USER")
+    @Mapping(target = "password", qualifiedBy = EncodeMapping.class)
     User toUser (UserPostRequest postRequest);
 
     UserGetResponse toUserGetResponse (User user);

@@ -7,10 +7,7 @@ import jornadajava.spring_boot_trench.request.UserPutRequest;
 import jornadajava.spring_boot_trench.response.UserGetResponse;
 import jornadajava.spring_boot_trench.response.UserPostResponse;
 import jornadajava.spring_boot_trench.response.UserPutResponse;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.MappingConstants;
-import org.mapstruct.MappingTarget;
+import org.mapstruct.*;
 
 //transformando o mapper em um bean para fazer injeção de dependencia
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING,
@@ -31,6 +28,10 @@ public interface UserMapper {
     UserGetResponse toUserGetResponse (User user);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "password", qualifiedBy = EncodeMapping.class)
+    //oq esse bean mapping esta fazendo é: se na hora de atualizar o usuario deixar algum campo null, mantenha o antigo
+    //se vier senha nova, criptografe
+    @BeanMapping(nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE)
     void UserToUpdate (UserPutRequest dto, @MappingTarget User user);
 
     UserPostResponse toUserPostResponse(User user);

@@ -20,5 +20,6 @@ public class UserPutRequest {
     //anotação @Email valida o campo email e verificar se o email atende a expressão valida
     @Email(regexp = "^[\\w-\\.]+@([\\w-]+\\.)+[\\w-]{2,10}$",message = "email invalidado")
     private String email;
+    private String password;
 
 }

@@ -77,7 +77,7 @@ public class UserService {
     }
 
     @Transactional
-      //Executa esta anotação faz uma transação de banco de dados gerenciada pelo Spring.
+      //Executar esta anotação faz uma transação de banco de dados gerenciada pelo Spring.
       //Isso assegura a atomicidade (todas as operações de banco de dados neste método são concluídas com sucesso ou nenhuma delas é aplicada permanentemente)
       //e a consistência dos dados, fazendo rollback por padrão em caso de RuntimeExceptions.
     public void delete(Long id){
@@ -103,7 +103,9 @@ public class UserService {
                 .orElseThrow(()-> new NotFoundException("id not found"));
 
 
+        //put request é oq vai ser usado para mudar no userToUpdate
         mapper.UserToUpdate(putRequest, userToUpdate);
+        //e entao salvamos o userToUpdate atualizado no banco
         User updatedUser = userRepository.save(userToUpdate);
         log.info("User updated {}", updatedUser);
 

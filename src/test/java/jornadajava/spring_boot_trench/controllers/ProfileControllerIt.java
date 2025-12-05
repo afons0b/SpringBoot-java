@@ -1,5 +1,6 @@
 package jornadajava.spring_boot_trench.controllers;
 
+import jornadajava.spring_boot_trench.config.TestRestTemplateConfig;
 import jornadajava.spring_boot_trench.config.TestcontainersConfiguration;
 import jornadajava.spring_boot_trench.request.ProfilePostRequest;
 import jornadajava.spring_boot_trench.response.ProfileGetResponse;
@@ -14,10 +15,9 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
-import org.springframework.transaction.annotation.Transactional;
-
 import java.util.List;
 
 
@@ -25,8 +25,8 @@ import java.util.List;
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
 @ActiveProfiles("test")
-@Transactional
-@Import(TestcontainersConfiguration.class)
+@Import({TestcontainersConfiguration.class, TestRestTemplateConfig.class})
+@DirtiesContext
 class ProfileControllerIt {
     private static final String URL = "/v1/profile";
     @Autowired
@@ -35,7 +35,7 @@ class ProfileControllerIt {
     @Test
     @DisplayName("GET")
     //2
-    @Sql("/sql/init_2_profiles.sql")
+    @Sql(value = "/sql/init_one_user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Order(1)
     void findAll_returndAllProfiles_WhenSuccessful() throws Exception{
         //aqui estamos definindo o tipo de objeto que estamos esperando como resposta
@@ -58,6 +58,7 @@ class ProfileControllerIt {
 
     @Test
     @DisplayName("GET")
+    @Sql(value = "/sql/init_only_user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Order(2)
     void findAll_returns_emptyList(){
         var typeReference = new ParameterizedTypeReference<List<ProfileGetResponse>>(){
@@ -73,6 +74,7 @@ class ProfileControllerIt {
 
     @Test
     @DisplayName("POST")
+    @Sql(value = "/sql/init_only_user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Order(3)
     void saves_aNew_object(){
         var profileToSave = ProfilePostRequest.builder()

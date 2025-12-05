@@ -2,9 +2,10 @@ package jornadajava.spring_boot_trench.controllers;
 
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.BDDMockito.any;
-import jornadajava.spring_boot_trench.domain.User;
+
+import jornadajava.spring_boot_trench.config.PasswordEncoderConfig;
+import jornadajava.spring_boot_trench.mapper.PassWordEncoderMapper;
 import jornadajava.spring_boot_trench.mapper.UserMapperImpl;
-import jornadajava.spring_boot_trench.repository.UserRepository;
 import jornadajava.spring_boot_trench.request.UserPostRequest;
 import jornadajava.spring_boot_trench.request.UserPutRequest;
 import jornadajava.spring_boot_trench.response.UserGetResponse;
@@ -28,6 +29,7 @@ import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
@@ -35,6 +37,7 @@ import org.springframework.test.web.servlet.MvcResult;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.csrf;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -46,7 +49,8 @@ import java.util.stream.Stream;
 
 @WebMvcTest(controllers = UserController.class)
 @ActiveProfiles("test")
-@Import({UserMapperImpl.class})
+@Import({UserMapperImpl.class, PassWordEncoderMapper.class, PasswordEncoderConfig.class})
+@WithMockUser
 class UserControllerTest {
     @Autowired
     //o MockMvc é como se fosse um postman mas emulado no teste, um postman de mentira
@@ -79,8 +83,12 @@ class UserControllerTest {
         return new String(Files.readAllBytes(file.toPath()));
     }
 
+    //atualizações: dps que o spring securityfoi inserido,
+    //os testes todos quebrama pois agr precisa de autorização
+    //isso é resolvido com @WithMockUser
     @Test
     @DisplayName("getAll deve retornar lista de DTOs")
+    @WithMockUser(username = "creator", authorities = {"ADMIN"})
     @Order(1)
     void getAll_retornaListaDeDtos() throws Exception {
         BDDMockito.when(service.findAll()).thenReturn(userGetResponseList);
@@ -158,7 +166,8 @@ class UserControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.post("/v1/user")
                         .content(request)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isCreated())
                 .andExpect(MockMvcResultMatchers.content().json(response));
@@ -183,7 +192,8 @@ class UserControllerTest {
 
         mockMvc.perform(MockMvcRequestBuilders.put("/v1/user/{id}", id)
                         .content(request)
-                        .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.content().json(response));
@@ -198,7 +208,8 @@ class UserControllerTest {
 
         BDDMockito.doNothing().when(service).delete(eq(id));
 
-        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/user/{id}", id))
+        mockMvc.perform(MockMvcRequestBuilders.delete("/v1/user/{id}", id)
+                        .with(csrf()))
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isNoContent());
     }
@@ -216,7 +227,8 @@ class UserControllerTest {
 
         MvcResult mvcResult = mockMvc.perform(MockMvcRequestBuilders
                         .post("/v1/user")
-                        .content(request).contentType(MediaType.APPLICATION_JSON))
+                        .content(request).contentType(MediaType.APPLICATION_JSON)
+                        .with(csrf()))
 
                 .andDo(MockMvcResultHandlers.print())
                 .andExpect(MockMvcResultMatchers.status().isBadRequest())

@@ -2,5 +2,6 @@
   "name": "Carlos",
   "idade": 30,
   "lastName": "dev",
-  "email": "carlosdev@email.com"
+  "email": "carlosdev@email.com",
+  "password": "123"
 }

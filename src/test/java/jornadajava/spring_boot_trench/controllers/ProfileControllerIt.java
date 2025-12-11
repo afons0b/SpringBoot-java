@@ -12,9 +12,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.context.annotation.Import;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.*;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
@@ -73,7 +71,7 @@ class ProfileControllerIt {
     }
 
     @Test
-    @DisplayName("POST")
+    @DisplayName("POST - Cria perfil com sucesso")
     @Sql(value = "/sql/init_only_user.sql", executionPhase = Sql.ExecutionPhase.BEFORE_TEST_METHOD)
     @Order(3)
     void saves_aNew_object(){
@@ -81,7 +79,12 @@ class ProfileControllerIt {
                 .name("ADMIN_TESTE")
                 .description("restTemplate teste").build();
 
-        var profileHttpEntity = new HttpEntity<>(profileToSave);
+        //Busca o Token antes de enviar
+        HttpHeaders headers = getCsrfHeaders();
+
+        //Envelopa o Objeto + Headers (Token)
+        var profileHttpEntity = new HttpEntity<>(profileToSave, headers);
+
         var responseEntity = restTemplate
                 .exchange(URL, HttpMethod.POST, profileHttpEntity, ProfilePostResponse.class);
 
@@ -90,8 +93,40 @@ class ProfileControllerIt {
         Assertions.assertThat(responseEntity.getBody()).isNotNull().hasNoNullFieldsOrProperties();
 
         ProfilePostResponse postResponse = responseEntity.getBody();
-
         Assertions.assertThat(postResponse.getId()).isNotNull();
         Assertions.assertThat(postResponse.getName()).isEqualTo("ADMIN_TESTE");
+    }
+
+    //Esse método vai no /csrf, pega o cookie e o token e devolve os headers prontos
+    private HttpHeaders getCsrfHeaders() {
+        // 1. Chama o endpoint /csrf
+        ResponseEntity<String> csrfResponse = restTemplate.exchange("/csrf", HttpMethod.GET, null, String.class);
+
+        // 2. Pega os Cookies (Sessão + Token)
+        List<String> cookies = csrfResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
+
+        // 3. Valida se veio cookie
+        if (cookies == null || cookies.isEmpty()) {
+            // Tenta uma estratégia de fallback simples caso a lista venha nula
+            return new HttpHeaders();
+        }
+
+        // 4. Junta os cookies numa string só
+        String cookieHeaderValue = String.join("; ", cookies);
+
+        // 5. Extrai o valor do XSRF-TOKEN
+        String xsrfToken = cookies.stream()
+                .filter(c -> c.contains("XSRF-TOKEN="))
+                .findFirst()
+                .map(c -> c.split("XSRF-TOKEN=")[1].split(";")[0])
+                .orElse("");
+
+        // 6. Monta o Header de volta
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add(HttpHeaders.COOKIE, cookieHeaderValue);
+        headers.add("X-XSRF-TOKEN", xsrfToken);
+
+        return headers;
     }
 }

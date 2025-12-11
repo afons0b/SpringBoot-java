@@ -1,0 +1,30 @@
+[
+  {
+    "id": 1,
+    "name": "Joca",
+    "lastName": "Da Silva",
+    "email": "joca@teste.academy",
+    "idade": 25
+  },
+  {
+    "id": 2,
+    "name": "Maria",
+    "lastName": "Silva",
+    "email": "maria@teste.academy",
+    "idade": 22
+  },
+  {
+    "id": 3,
+    "name": "Joao",
+    "lastName": "Souza",
+    "email": "joao@teste.academy",
+    "idade": 30
+  },
+  {
+    "id": 4,
+    "name": "Ana",
+    "lastName": "Pereira",
+    "email": "ana@teste.academy",
+    "idade": 28
+  }
+]

@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "name": "Joca",
+    "lastName": "Da Silva",
+    "email": "joca@teste.academy",
+    "idade": 25
+  },
+  {
+    "id": 2,
+    "name": "Joca",
+    "lastName": "Santos",
+    "email": "joca.santos@teste.academy",
+    "idade": 40
+  }
+]

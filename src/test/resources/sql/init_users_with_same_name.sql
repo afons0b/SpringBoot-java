@@ -1,0 +1,2 @@
+INSERT INTO `user` (`id`, `name`, `last_name`, `email`, `idade`, `password`, `roles`) VALUES
+(2, 'Joca', 'Santos', 'joca.santos@teste.academy', 40, '{bcrypt}$2a$10$N.zmdr9k7uOCQb376ye.5.ZncCr4X8lrQIYn.MnNdtWkORsnl.Nee', 'USER');

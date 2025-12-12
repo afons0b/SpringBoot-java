@@ -5,6 +5,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import jornadajava.spring_boot_trench.commons.FileUtils;
 import jornadajava.spring_boot_trench.config.TestcontainersConfiguration;
+import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,10 +37,8 @@ class ProfileControllerResAssuredIt {
     private static final String URL = "/v1/profile";
     @Autowired
     private TestRestTemplate restTemplate;
-
     @Autowired
     private FileUtils fileUtils;
-
     @LocalServerPort
     private int port;
 

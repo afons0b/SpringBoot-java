@@ -43,10 +43,9 @@ public class SecurityConfig {
                         // OBS: O Spring espera que no banco a role esteja salva como "ROLE_ADMIN"
                         // ou que você use hasAuthority("ADMIN") se salvou sem o prefixo.
                         .requestMatchers(HttpMethod.GET, "/v1/user").hasAuthority("ADMIN")
-
-                        // SÓ ADMIN DELETA E FILTRA
                         .requestMatchers(HttpMethod.DELETE, "/v1/user/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/v1/user/findByName").hasAuthority("USER")
+                        .requestMatchers(HttpMethod.PUT, "/v1/user/*").hasAuthority("ADMIN")
 
                         // Qualquer outra coisa: TEM QUE ESTAR LOGADO
                         .anyRequest().authenticated()

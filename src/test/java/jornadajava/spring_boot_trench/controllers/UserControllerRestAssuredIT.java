@@ -17,6 +17,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
@@ -24,6 +25,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.core.type.TypeReference;
 
 import java.io.IOException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -46,6 +48,9 @@ public class UserControllerRestAssuredIT {
     private ObjectMapper objectMapper;
     @Autowired
     private UserRepository repository;
+    @Autowired
+    private PasswordEncoder passwordEncoder;
+
 
     @BeforeEach
     void setUrl(){
@@ -219,6 +224,91 @@ public class UserControllerRestAssuredIT {
 
         // Compara se o JSON de resposta bate com o esperado
         Assertions.assertThat(mapReal).isEqualTo(mapEsperado);
+    }
+
+    @Test
+    @DisplayName("PUT v1/user atualiza a senha corretamente (sem criptografar duas vezes)")
+    @Order(6)
+    void update_User_UpdatesPassword_WhenSuccessful() throws IOException {
+
+
+        var requestArquivo = fileUtils.readResourceFile("user/put-request-user-200.json");
+
+
+        Map<String, Object> requestMap = objectMapper.readValue(
+                requestArquivo,
+                new TypeReference<HashMap<String, Object>>() {}
+        );
+
+
+        String novaSenha = "senhaNova123";
+        requestMap.put("password", novaSenha); // Sobrescreve o que estava no arquivo
+
+
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestMap) // Manda o Map modificado
+                .when()
+                .put(URL + "/{id}", 1)
+                .then()
+                .statusCode(HttpStatus.OK.value());
+
+        // 4. A HORA DA VERDADE (Vai no banco)
+        var userNoBanco = repository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Joca sumiu!"));
+
+        // 5. Verifica se a senha foi atualizada corretamente
+        // Se tiver o bug de "dupla criptografia", isso aqui vai dar FALSE.
+        boolean senhaBate = passwordEncoder.matches(novaSenha, userNoBanco.getPassword());
+
+        org.assertj.core.api.Assertions.assertThat(senhaBate)
+                .withFailMessage("A senha no banco não bate com a nova senha! Provavelmente foi criptografada duas vezes.")
+                .isTrue();
+    }
+
+    @Test
+    @DisplayName("PUT - Atualiza senha e garante que não houve criptografia dupla")
+    @Order(7)
+    void update_Password_ValidatesEncryption_WhenSuccessful() throws IOException {
+
+        // 1. Prepara Request (Usando o request de PUT que já temos)
+        var requestArquivo = fileUtils.readResourceFile("user/put-request-user-200.json");
+        Map<String, Object> requestMap = objectMapper.readValue(
+                requestArquivo,
+                new TypeReference<HashMap<String, Object>>() {}
+        );
+
+        // 2. Define uma senha nova CLARA e LIMPA
+        String senhaPura = "novaSenhaSecreta123";
+        requestMap.put("password", senhaPura);
+
+        // 3. Faz o PUT
+        RestAssured.given()
+                .contentType(ContentType.JSON)
+                .body(requestMap)
+                .when()
+                .put(URL + "/{id}", 1) // ou .put(URL + "/{id}", 1)
+                .then()
+                .statusCode(HttpStatus.OK.value());
+
+        // 4. Vai no banco buscar o usuário (ID 1 - Joca)
+        var userNoBanco = repository.findById(1L)
+                .orElseThrow(() -> new RuntimeException("Usuário não encontrado!"));
+
+        // 5. A PROVA DOS NOVE
+        // O método .matches(senhaPura, hashDoBanco) faz o trabalho sujo.
+        // Ele pega a senhaPura, criptografa UMA vez e compara com o hash.
+
+        boolean senhaValida = passwordEncoder.matches(senhaPura, userNoBanco.getPassword());
+
+        org.assertj.core.api.Assertions.assertThat(senhaValida)
+                .withFailMessage("""
+                    ERRO CRÍTICO: A senha não confere!
+                    Possíveis causas:
+                    1. A senha não foi atualizada.
+                    2. A senha foi criptografada DUAS VEZES (Double Hash Bug).
+                    """)
+                .isTrue();
     }
 
 }

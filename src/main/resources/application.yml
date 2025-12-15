@@ -1,4 +1,6 @@
 spring:
+  main:
+    allow-bean-definition-overriding: true
   security:
     user:
       name: user
@@ -39,3 +41,11 @@ decorator:
       format-sql: true
       slow-query:
         threshold: 1000
+
+management:
+  server:
+    port: 8989
+  endpoints:
+    web:
+      exposure:
+        include: "*"

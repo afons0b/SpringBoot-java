@@ -1,15 +1,35 @@
+version: '3.8'
+
+# 1. Bloco de Variáveis
+x-database-variables: &database-variables
+  SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/user_service?useTimezone=true&serverTimezone=UTC&createDatabaseIfNotExist=true
+  ROOT_USER: root
+  ROOT_PASSWORD: mysql123
+
 services:
+  #Serviço do banco
   mysql:
-    image: mysql:9.4.0
+    image: mysql:9.0.1
     container_name: mysql
     environment:
       MYSQL_ROOT_PASSWORD: mysql123
-      MYSQL_USER: afonso
-      MYSQL_PASSWORD: javinha
+      MYSQL_DATABASE: user_service
     ports:
       - "3307:3306"
     volumes:
       - javajourney-db:/var/lib/mysql
+
+  spring-boot-trench:
+    image: afonsonasc/spring-boot-trench:0.0.1-SNAPSHOT
+    container_name: spring-boot-trench
+    ports:
+      - "8080:8080"
+      - "8989:8989"
+    environment:
+      <<: *database-variables
+      logging.level.org.springframework.security: DEBUG
+    depends_on:
+      - mysql #Garante que o Java espera o banco
 
 volumes:
   javajourney-db:

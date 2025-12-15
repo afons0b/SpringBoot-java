@@ -1,5 +1,6 @@
 package jornadajava.spring_boot_trench.config;
 
+import org.springframework.boot.actuate.autoconfigure.security.servlet.EndpointRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -42,10 +43,11 @@ public class SecurityConfig {
                         // SÓ ADMIN VÊ A LISTA DE USUÁRIOS
                         // OBS: O Spring espera que no banco a role esteja salva como "ROLE_ADMIN"
                         // ou que você use hasAuthority("ADMIN") se salvou sem o prefixo.
-                        .requestMatchers(HttpMethod.GET, "/v1/user").hasAuthority("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/v1/user").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/v1/user/*").hasAuthority("ADMIN")
                         .requestMatchers(HttpMethod.GET, "/v1/user/findByName").hasAuthority("USER")
                         .requestMatchers(HttpMethod.PUT, "/v1/user/*").hasAuthority("ADMIN")
+                        .requestMatchers(EndpointRequest.toAnyEndpoint()).permitAll()
 
                         // Qualquer outra coisa: TEM QUE ESTAR LOGADO
                         .anyRequest().authenticated()

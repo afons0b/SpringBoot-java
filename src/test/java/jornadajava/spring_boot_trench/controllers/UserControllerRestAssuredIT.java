@@ -6,7 +6,7 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.common.mapper.TypeRef;
 import io.restassured.http.ContentType;
 import jornadajava.spring_boot_trench.commons.FileUtils;
-import jornadajava.spring_boot_trench.commons.UserUtils;
+import jornadajava.spring_boot_trench.commons.CepUtils;
 import jornadajava.spring_boot_trench.config.TestcontainersConfiguration;
 import jornadajava.spring_boot_trench.repository.UserRepository;
 import org.assertj.core.api.Assertions;
@@ -39,7 +39,7 @@ import java.util.Map;
 public class UserControllerRestAssuredIT {
     private static final String URL = "/v1/user";
     @Autowired
-    private UserUtils userUtils;
+    private CepUtils userUtils;
     @Autowired
     private FileUtils fileUtils;
     @LocalServerPort

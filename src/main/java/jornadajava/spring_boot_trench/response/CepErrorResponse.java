@@ -1,0 +1,10 @@
+package jornadajava.spring_boot_trench.response;
+
+import java.util.List;
+
+public record CepErrorResponse(String name, String message, String type, List<ErrorResponse> erros) {
+}
+
+record ErrorResponse(String name, String message, String service){
+
+}

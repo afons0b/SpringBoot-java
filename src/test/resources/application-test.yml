@@ -11,5 +11,5 @@ spring:
         globally_quoted_identifiers: true
 
 brasil-api:
-  base-url: https://localhost:8085/api
-  cep-uri: /cep/v1/{cep}}
+  base-url: http://localhost:${wiremock.server.port}/api
+  cep-uri: /cep/v1/{cep}

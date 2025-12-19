@@ -22,11 +22,20 @@ import java.util.List;
 //essa anotação gera uma porta aleatoria para que possamos rodar o teste container
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
 @TestMethodOrder(MethodOrderer.OrderAnnotation.class)
+//ativamos
 @ActiveProfiles("test")
+//aqui adicionamos um teste de containers, por que?
+//sem isso, eu teria que usar o banco H2, é rapido mas é "falso"
+//o mysql tem comando que o h2 nao tem, testar no h2 e rodar em produção no sql
+//é pedir pra dar bugs surpresa
+//entao subimos um container cm o banco sql para simular melhor
 @Import({TestcontainersConfiguration.class, TestRestTemplateConfig.class})
 @DirtiesContext
 class ProfileControllerIt {
     private static final String URL = "/v1/profile";
+    //eu preciso que alguem faça requisiçoes http,
+    //mas como isso é um teste entao useu o test rest template
+    //o test rest template é como se fosse um postman so que rodando dentro do codigo java
     @Autowired
     private TestRestTemplate restTemplate;
 
@@ -88,6 +97,7 @@ class ProfileControllerIt {
         var responseEntity = restTemplate
                 .exchange(URL, HttpMethod.POST, profileHttpEntity, ProfilePostResponse.class);
 
+        //assertions
         org.assertj.core.api.Assertions.assertThat(responseEntity).isNotNull();
         org.assertj.core.api.Assertions.assertThat(responseEntity.getStatusCode()).isEqualTo(HttpStatus.CREATED);
         Assertions.assertThat(responseEntity.getBody()).isNotNull().hasNoNullFieldsOrProperties();
@@ -99,29 +109,29 @@ class ProfileControllerIt {
 
     //Esse método vai no /csrf, pega o cookie e o token e devolve os headers prontos
     private HttpHeaders getCsrfHeaders() {
-        // 1. Chama o endpoint /csrf
+        //Chama o endpoint /csrf
         ResponseEntity<String> csrfResponse = restTemplate.exchange("/csrf", HttpMethod.GET, null, String.class);
 
-        // 2. Pega os Cookies (Sessão + Token)
+        //Pega os Cookies (Sessão + Token)
         List<String> cookies = csrfResponse.getHeaders().get(HttpHeaders.SET_COOKIE);
 
-        // 3. Valida se veio cookie
+        //Valida se veio cookie
         if (cookies == null || cookies.isEmpty()) {
             // Tenta uma estratégia de fallback simples caso a lista venha nula
             return new HttpHeaders();
         }
 
-        // 4. Junta os cookies numa string só
+        //Junta os cookies numa string só
         String cookieHeaderValue = String.join("; ", cookies);
 
-        // 5. Extrai o valor do XSRF-TOKEN
+        //Extrai o valor do XSRF-TOKEN
         String xsrfToken = cookies.stream()
                 .filter(c -> c.contains("XSRF-TOKEN="))
                 .findFirst()
                 .map(c -> c.split("XSRF-TOKEN=")[1].split(";")[0])
                 .orElse("");
 
-        // 6. Monta o Header de volta
+        //Monta o Header de volta
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add(HttpHeaders.COOKIE, cookieHeaderValue);

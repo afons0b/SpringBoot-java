@@ -5,7 +5,6 @@ import io.restassured.builder.RequestSpecBuilder;
 import io.restassured.http.ContentType;
 import jornadajava.spring_boot_trench.commons.FileUtils;
 import jornadajava.spring_boot_trench.config.TestcontainersConfiguration;
-import org.assertj.core.api.Assertions;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,12 +13,9 @@ import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
-import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.context.jdbc.SqlMergeMode;
-import org.springframework.transaction.annotation.Transactional;
-
 
 
 //essa anotação gera uma porta aleatoria para que possamos rodar o teste container
@@ -33,7 +29,7 @@ import org.springframework.transaction.annotation.Transactional;
 @SqlMergeMode(SqlMergeMode.MergeMode.MERGE)
 @ActiveProfiles("test")
 @Import(TestcontainersConfiguration.class)
-class ProfileControllerResAssuredIt {
+class ProfileControllerRestAssuredIt {
     private static final String URL = "/v1/profile";
     @Autowired
     private TestRestTemplate restTemplate;

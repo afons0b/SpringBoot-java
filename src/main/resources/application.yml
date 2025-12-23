@@ -1,4 +1,6 @@
 spring:
+  flyway:
+    enabled: true
   main:
     allow-bean-definition-overriding: true
   security:
@@ -16,7 +18,7 @@ spring:
   jpa:
     show-sql: false
     hibernate:
-      ddl-auto: update
+      ddl-auto: none
     properties:
       hibernate.format_sql: false
 

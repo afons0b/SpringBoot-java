@@ -36,7 +36,7 @@ Lá você poderá testar todos os endpoints (`GET`, `POST`, etc.) diretamente pe
 
 ---
 
-## ⚡ Como Rodar o Projeto
+## Como Rodar o Projeto
 
 Você precisa apenas de **Docker** e **Java 21** instalados.
 

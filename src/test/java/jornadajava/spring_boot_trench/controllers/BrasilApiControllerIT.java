@@ -5,9 +5,9 @@ import io.restassured.http.ContentType;
 import io.restassured.specification.RequestSpecification;
 import jornadajava.spring_boot_trench.commons.FileUtils;
 import jornadajava.spring_boot_trench.config.TestcontainersConfiguration;
-import jornadajava.spring_boot_trench.config.RestAssuredConfig; // <--- O IMPORT CERTO AQUI
+import jornadajava.spring_boot_trench.config.RestAssuredConfig;
 
-import org.hamcrest.Matchers; // <--- O Matchers padrão
+import org.hamcrest.Matchers;
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
